@@ -1,0 +1,331 @@
+---
+title: Quantifying uncertainty in health impact modelling
+author: Christopher Jackson<br>MRC Biostatistics Unit, University of Cambridge
+email: chris.jackson@mrc-bsu.cam.ac.uk
+format:
+  revealjs: 
+    embed-resources: true
+    slide-number: true
+    incremental: true
+    preview-links: auto
+    theme: styles.scss
+---
+
+# !!WORK IN PROGRESS!! 
+
+[ Todo interleave this all with practical sessions ] 
+
+
+# Uncertainty in HIA models: Summary of lecture
+
+* Parametric models --- definitions
+
+* Quantifying parameter uncertainty using _probability distributions_
+
+* Impact of parameter uncertainty
+
+    - _Sensitivity_ and _uncertainty analysis_ of model outputs
+
+    - _Value of Information_ (VoI) analysis
+
+
+# Parametric models 
+
+Many health impact models are **parametric** 
+
+Deterministic function mapping inputs to outputs
+
+Example
+() to years of life saved 
+
+
+
+# Microsimulation / stochastic / nonparametric models?? 
+
+What about models that generate individual-level outputs? 
+(stochastic, microsimulation)
+(Examples of these) 
+
+Usually of interest to summarise those individuals (mean, or mean in different subgroups) then (as the simulated population is large enough) can treat the summary as deterministic 
+
+uncertainty about mean vs variability about individuals
+
+
+# Parameters are generally uncertain
+
+Examples 
+
+[ Interact?  Group discussion? ] 
+
+They are obtained from limited data.  finite sapmles, indivs vary, past different from future. 
+
+Data that does not quite represent the setting 
+
+All models are wrong, not all uncs easy to quantify.  "Structural uncertainties" in theory dealt with by converting to a bigger model with uncertain parameters - but won't go into
+
+
+# Why does uncertainty matter? 
+
+[ interact ?  ] 
+
+We've build best model we can.  Just report our best estimate ? 
+
+Technical point - in nonlinear models - best estimate is wrong if we don't 
+
+Best estimate might be best we can do for the moment - but what about the future?
+
+We may be able to improve the model with better data.  Scientific progress.  Learn more about world, make better decisions in future. 
+
+Policy decision made on best estimate may be wrong [ note we don't go into decision theory here ] 
+
+
+## Sensitivity versus uncertainty analysis - different questions
+
+Sensitivity analysis: answers "what if" questions.
+
+Suppose [ example from ithim. ] 
+
+--- if the parameter was [small], output would be [what]
+--- if the parameter was [big], output would be [what]
+
+(aside from any evidence about is the parameter likely to be small or big) 
+
+
+Uncertainty analysis: 
+
+What range of outputs, given current evidence [ considering all parameters ] 
+
+Which parameter uncertainties most influence the uncertainty in the outputs 
+
+Consider both questions here - but in any case it is important to describe evidence about parameters - including extent of uncertainty
+
+
+# How to quantify uncertainty 
+
+Starting point - value of a parameter. 
+best guess 
+may be as little as 
+may be as much as 
+
+Credible interval [ probability judgement: 95% between a and b ] 
+
+$\rightarrow$ probability distributions
+uncertainty analysis
+value of further information 
+
+Where do these come from.   Two broad situations
+statistical analyses vs judgements
+
+
+# Statistical uncertainty 
+
+Examples 
+
+Do analysis yourself
+
+Publications - estimates and confidence intervals, standard errors 
+
+
+# Judgements 
+
+Informal summaries of what is known.  As many ways to do this as there are models, not general guidelines, we'll give examples. 
+
+Best guess and credible interval 
+
+Structured expert elicitation (formal process) 
+
+
+# Examples of judgements 
+
+
+
+
+# Probability distributions 
+
+Given a best guess and credible interval, derive a **full probability distribution**
+
+Not all values in are equally plausible.  values on the inside are more likely
+
+Once we have the distributions - can use to get output uncertainty and Voi 
+
+
+# ... from statistical analyses
+
+Bayesian - get the distribution for free
+
+Explain idea of Bayesian statistics here 
+
+Frequentist.  We will pretend to be Bayesian. 
+Conceive these as approximations to Bayesian analyses with vague priors 
+Normal approx to posterior in theory 
+
+
+# .. from judged credible intervals 
+
+Fit a distribution 
+
+Examples 
+
+Cover Beta, Normal and log Normal though all kinda arbitrary 
+
+
+# Normal distribution
+
+95 percent credible interval equals mean pm 2 SDs
+
+Width of CI is four standard deviations
+
+Symmetry. 
+
+Transform  log quantity then put normal on it 
+
+[ interactive shiny apps here ??? ] 
+
+
+# Beta distribution 
+
+Two parameters - many ways to do it 
+
+Easiest to elicit 4 SD and derive SD.  Works if symmetric 
+
+Or moment matching - demo software.   Example for skewed/lo/hi
+
+Revise and respecify limits if unsure.  Mean vs mode, median.   Limits may not be certain
+
+
+# Practical - quantifying uncertainty around parameters 
+
+
+
+
+# Doing uncertainty analysis 
+
+Back to ITHIM example 
+
+Monte Carlo simulation 
+
+Simply communicate interval/distribution around the results
+
+But want to go further and query the model and uncertainties -- e.g. we may not be confident about some of the input uncertainties -- do they / might they matter?
+Is the result confident or do we want further data? 
+
+
+# Probabilistic one-way sensitivity analysis
+
+
+
+
+# Practical - uncertainty analysis in a model
+
+
+
+
+
+
+# Value of Information 
+
+Remember two questions above
+
+sensitivity - what if model was a bit different 
+
+uncertainty - range of values given current evidence
+Which parameter uncertainties influence outputs
+
+A third [overlapping] question - what would be the benefit of getting better information.  This is VoI. 
+
+Example.  Show result from Prob 1wsa - looks like varying ? within plausible range has more of an effect than. 
+
+A different way to ask this...
+
+
+# Value of Information 
+
+How much more precise would x get... 
+
+if we were to learn the exact value of ? 
+
+* Expected value of partial perfect information
+
+if we did a study of ?? people
+
+* Expected value of sample perfect information
+
+Key point is that we don't know the value, or the result of the study, when we calculate this --- so we calculate an _expected_ value, given what is currently known
+
+Aim is to  prioritise further research to reduce uncertainty 
+
+Study design  [ advanced, not discussed ] 
+
+
+# What does this have to do with "value" 
+
+Slide to explain connection to health economic modelling 
+
+Information has value - reduces uncertainty - better informed policy making 
+
+Can go further and model the policy and its consequences 
+
+decisions lead to e.g. health benefits, but have costs Done in health
+technology assessment, but not so much in health impact modelling [
+advanced not discussed ]
+
+So what is the point in talking about "value" if we don't model the policy? 
+
+Define value as "precision of estimate" (better knowledge assumed to eventually have benefits)
+
+Technical benefit - same computational tools developed for health economics can be uased 
+
+
+
+# Expected value of partial perfect information
+
+Also called the "main effect" in computer model sensitivity analysis literature
+
+Formal definition - expected reduction in variance
+
+Illustration with a scatterplot 
+
+
+# Computing the EVPPI 
+
+Regression modelling 
+
+Splines (black box) 
+
+
+# EVPPI for more than one parameter at once 
+
+Multiple regression models
+
+Recommend "earth" method
+
+
+# Presenting conclusions of EVPPI analysis 
+
+
+
+# Practical session 
+
+... Use of "voi" package
+
+
+
+
+# Advanced topics 
+
+Pointers to resources to learn more about 
+
+* VoI in decision models [ book but HTA-focused ] 
+
+* Expected value of sample information [ note done in decision models, see book, but not HIA. ]. 
+
+  Simple examples in paper and package 
+
+
+
+# Group discussion of advanced topics 
+
+What uncertainty/sensitivity questions do you want to answer in your own work? 
+
+Do you have the tools to do this? 
+
