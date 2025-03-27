@@ -1,5 +1,5 @@
 ---
-title: Quantifying uncertainty in health impact modelling
+title: Uncertainty in quantitative health impact modelling
 author: Christopher Jackson<br>MRC Biostatistics Unit, University of Cambridge
 email: chris.jackson@mrc-bsu.cam.ac.uk
 format:
@@ -15,6 +15,8 @@ format:
 
 [ Todo interleave this all with practical sessions ] 
 
+<!-- https://github.com/ITHIM/ITHIM-R/tree/simple -->
+
 
 # Uncertainty in HIA models: Summary of lecture
 
@@ -22,151 +24,263 @@ format:
 
 * Quantifying parameter uncertainty using _probability distributions_
 
-* Impact of parameter uncertainty
+* Questions we can answer better by quantifying uncertainty
 
-    - _Sensitivity_ and _uncertainty analysis_ of model outputs
+    - _Uncertainty_ and _sensitivity analysis_ of model outputs
 
     - _Value of Information_ (VoI) analysis
 
 
+# Quantitative models
+
+Models approximate process that generates some output of interest, helping to inform decision-making.
+
+Example: ITHIM health impact model [ TODO picture ]
+
+* inputs: travel data, air pollution, physical activity, injuries, + scenarios of change
+
+* outputs: population health (and changes under scenarios)
+
+. . . 
+
+These generally involve **parameters**.  What are these? 
+
+<!-- ITHIM inputs: 
+[city]
+* Travel survey individuals
+* Mortality from disease : deaths and YLL for a pop [within year]? 
+* City population (scaled from country mortality)
+[global]
+AP DRFs 
+PA DRFs. 
+--> 
+
+
 # Parametric models 
 
-Many health impact models are **parametric** 
+Model input parameters: examples
 
-Deterministic function mapping inputs to outputs
+* background exposure [e.g. PM2.5, PA] in an area
 
-Example
-() to years of life saved 
+* relative risk for [health outcome] given [change in PA/AP exposure]
+
+. . .
+
+These are **representations of knowledge** about a population.
+
+We can usually conceive parameters as *summaries* of individual quantities over a large/infinite "population". 
+
+<!-- [ group discussion, exercise, describe the population??  ?? ] 
+
+ans: 
+* exposure is exposure for an individual of given kind over time and space - actual exposures will vary 
+
+* (number of disease cases in a population with exposure 1 / size of this population) / 
+* (number of disease cases in a population with exposure 1 / size of this population)
+
+-->
+
+Parameters $\rightarrow$ model outputs:  
+
+* In public health, usually interested in summaries over a population (or contrasts between sub-populations)
 
 
+<!-- Premise of lecture... --> 
 
-# Microsimulation / stochastic / nonparametric models?? 
+# Parameter uncertainty 
 
-What about models that generate individual-level outputs? 
-(stochastic, microsimulation)
-(Examples of these) 
+Knowledge is often uncertain $\rightarrow$ 
 
-Usually of interest to summarise those individuals (mean, or mean in different subgroups) then (as the simulated population is large enough) can treat the summary as deterministic 
+* parameters are uncertain 
 
-uncertainty about mean vs variability about individuals
+* conclusions from models are uncertain 
+
+
+# Individual variability versus uncertainty about knowledge
+
+Example parameters, for some population
+
+* Background exposure to PM2.5.  
+
+* Risk of death within one year.
+
+. . .
+
+We may be sure about the values of these.  Even so...
+
+* Exact exposures will be different for each individual
+
+* Some individuals will die within a year, some won't 
+
+. . .
+
+But we may be uncertain about the parameter values.
+
+. . . 
+
+**Individual variability can never be removed, but parameter uncertainty can be reduced with better knowledge**
+
+
+<!-- Exercise to test the difference --> 
 
 
 # Parameters are generally uncertain
 
-Examples 
+Two broad reasons for parameter uncertainty
 
-[ Interact?  Group discussion? ] 
+(a) summary of a limited population
 
-They are obtained from limited data.  finite sapmles, indivs vary, past different from future. 
+(b) population is different from the one we want 
 
-Data that does not quite represent the setting 
+	- Discuss examples of this 
+	
+<!-- different country. past vs future.  selection bias ---> 
 
-All models are wrong, not all uncs easy to quantify.  "Structural uncertainties" in theory dealt with by converting to a bigger model with uncertain parameters - but won't go into
+. . .
+
+Models are also uncertain ("structural" uncertainty)
+
+* "all models are wrong, but some are useful"
+
+* we won't go into this - ideally add more parameters for uncertain things - see briefly later
+
+<!-- 
+
+Exercise or discussion ?   Slido or such? 
+baseline AP/PA 
+baseline mortality, YLL 
+Dose response 
+what is the learning objective. there's always uncertainty. 
+or is it by definition that a parameter is a summary of the population 
+could just reiterate that 
+
+--> 
+
 
 
 # Why does uncertainty matter? 
 
 [ interact ?  ] 
 
-We've build best model we can.  Just report our best estimate ? 
+We've built best model we can.  Just report our "best estimate" to the decision maker? 
 
-Technical point - in nonlinear models - best estimate is wrong if we don't 
+* Decision makers need good evidence to change practice --- models should indicate strength of evidence for result
 
-Best estimate might be best we can do for the moment - but what about the future?
+* What about the future - we may be able to get better evidence - what research should be done?
 
-We may be able to improve the model with better data.  Scientific progress.  Learn more about world, make better decisions in future. 
+. . .
 
-Policy decision made on best estimate may be wrong [ note we don't go into decision theory here ] 
+Here we will cover **quantitative methods** for assessing uncertainty.  In particular, **probabilistic** methods. 
 
-
-## Sensitivity versus uncertainty analysis - different questions
-
-Sensitivity analysis: answers "what if" questions.
-
-Suppose [ example from ithim. ] 
-
---- if the parameter was [small], output would be [what]
---- if the parameter was [big], output would be [what]
-
-(aside from any evidence about is the parameter likely to be small or big) 
+* though there is a broader field of appraising evidence, engaging with stakeholders or experts etc...
 
 
-Uncertainty analysis: 
 
-What range of outputs, given current evidence [ considering all parameters ] 
+## Questions relevant to uncertainty quantification
 
-Which parameter uncertainties most influence the uncertainty in the outputs 
+**Uncertainty analysis**: about _strength of evidence_
 
-Consider both questions here - but in any case it is important to describe evidence about parameters - including extent of uncertainty
+* What range of outputs are plausible, given current evidence? 
+
+* Which parameters are most uncertain (most influence the uncertainty in the outputs)
+
+
+**Sensitivity analysis**: _"what if..."_
+
+* What if parameter took the value $b$ instead of $a$ --- how would the output change? 
+
+
+**Value of Information analysis**
+
+* How much would the model **improve** if we got better information?
+on some parameter?
 
 
 # How to quantify uncertainty 
 
-Starting point - value of a parameter. 
-best guess 
-may be as little as 
-may be as much as 
+Two broad approaches
 
-Credible interval [ probability judgement: 95% between a and b ] 
+(a) Statistical analyses of data (your own, or published analyses) giving **point** and **interval** estimates or standard errors
 
-$\rightarrow$ probability distributions
-uncertainty analysis
-value of further information 
+. . .
 
-Where do these come from.   Two broad situations
-statistical analyses vs judgements
+(b) Judgements (informal or from structured elictation), e.g.
 
+* **point estimate** (best guess) for parameter value 
 
-# Statistical uncertainty 
+* **credible interval** e.g. "I judge that the parameter is between $a$ and $b$, with 95% confidence"
 
-Examples 
+. . . 
 
-Do analysis yourself
+Our goal in each case is to obtain **probability distributions** for parameters
 
-Publications - estimates and confidence intervals, standard errors 
-
-
-# Judgements 
-
-Informal summaries of what is known.  As many ways to do this as there are models, not general guidelines, we'll give examples. 
-
-Best guess and credible interval 
-
-Structured expert elicitation (formal process) 
-
-
-# Examples of judgements 
-
-
+* powerful tool for uncertainty and sensitivity analysis
 
 
 # Probability distributions 
 
-Given a best guess and credible interval, derive a **full probability distribution**
+A **full probability distribution**
 
-Not all values in are equally plausible.  values on the inside are more likely
+![](plots/densarea.png)
 
-Once we have the distributions - can use to get output uncertainty and Voi 
-
-
-# ... from statistical analyses
-
-Bayesian - get the distribution for free
-
-Explain idea of Bayesian statistics here 
-
-Frequentist.  We will pretend to be Bayesian. 
-Conceive these as approximations to Bayesian analyses with vague priors 
-Normal approx to posterior in theory 
+For any pair of values $(a,b)$, we can deduce probability(parameter between $a$ and $b$) 
 
 
-# .. from judged credible intervals 
+# Statistical analyses: Bayesian methods
 
-Fit a distribution 
+Statistical analyses of observed data can be Bayesian or frequentist
 
-Examples 
+In either, data assumed to come from models with parameters... 
 
-Cover Beta, Normal and log Normal though all kinda arbitrary 
+* e.g. number of injuries in (area,time) from Poisson with rate $\lambda$.
+
+. . . 
+
+* **Bayesian methods** based around quantifying parameter uncertainty with probability. 
+
+* **Prior distribution** combined with study data $\rightarrow$ **posterior** distribution.
+
+[picture] 
+
+. . .
+
+Prior distribution dominates if data are weak.  No data: rely on prior judgement 
+
+
+# Statistical analyses: frequentist methods
+
+* Construct "estimators" of parameters.
+
+* Uncertainty quantified by imagining repeated samples from a population
+
+    * "Standard error": SD of estimates over repeated sampling.
+	* 95% confidence interval: contains true value in 95% of repeated samples.
+
+* Agrees with Bayesian estimates (posterior mean, standard deviation, credible interval) if prior is weak and data are large.
+  
+* Normal(mean, standard error).  positive on log scale 
+
+. . .
+
+If data are weak, Bayesian methods more helpful, since they allow background information as the prior 
+
+
+
+# Examples of judgements
+
+[ We need ITHIM detail here ] 
+
+
+# Distributions from credible intervals
+
+What is wrong with a distribution like this  [ PICTURE ] 
+
+This is a bit better [ TRIANGULAR ] 
+
+But this kind of thing is most realistic [ NORMAL ]
+
+
+Different distributions for quantities with different ranges... 
 
 
 # Normal distribution
@@ -195,85 +309,120 @@ Revise and respecify limits if unsure.  Mean vs mode, median.   Limits may not b
 
 # Practical - quantifying uncertainty around parameters 
 
+[ reference to ITHIM ] 
 
 
 
-# Doing uncertainty analysis 
+# Doing uncertainty analysis: Monte Carlo simulation 
 
-Back to ITHIM example 
+For each $i = 1, 2, \ldots N$ (enough to give precise summaries)
 
-Monte Carlo simulation 
+1. Simulate parameters $X_i$ from their uncertainty distributions
 
-Simply communicate interval/distribution around the results
+2. Compute the model output $Y_i = g(X_i)$ 
 
-But want to go further and query the model and uncertainties -- e.g. we may not be confident about some of the input uncertainties -- do they / might they matter?
-Is the result confident or do we want further data? 
+producing a sample from the model outputs $Y_1, \ldots, Y_N$   [ animate? ] 
+
+Summarise the sample to give e.g. 
+
+* a credible interval for the outputs
+
+* probability that e.g. number of deaths $>$ [important value] 
 
 
-# Probabilistic one-way sensitivity analysis
+# Technical point - uncertainty affects "best estimate" in nonlinear models
 
+Given a model with inputs $X$ and outputs $Y = g(X)$, where $g()$ is some mathematical function.
+
+Inputs $X$ are uncertain, with expected values $E(X)$.
+
+What is the expected value of $Y$?  Can we just plug in the best
+estimates of the inputs $g(E(X)$? 
+
+$E(Y)$ is only equal to $g(E(x))$ if the function $g()$ is **linear**:
+
+$$g(E(x)) = g((X_1 + \ldots + X_n)/n) = $$ (if $g()$ linear...)
+
+$$(g(X_1) + \ldots + g(X_n)) / n = E(g(X)) = E(Y)$$ 
+
+Most realistic models are **non-linear*: need Monte Carlo simulation to get the true expectation of the output. 
+
+
+# One-way sensitivity analysis: probabilistic view
+
+In standard "tornado plots" we vary one parameter at a time 
+
+
+
+![](plots/tornado.png)
 
 
 
 # Practical - uncertainty analysis in a model
 
 
-
+[ reference to ITHIM ] 
 
 
 
 # Value of Information 
 
-Remember two questions above
+Recall  
 
-sensitivity - what if model was a bit different 
+* sensitivity analysis: "what if model was a bit different" 
 
-uncertainty - range of values given current evidence
-Which parameter uncertainties influence outputs
+* uncertainty analysis: "what is strength of evidence in model" 
 
-A third [overlapping] question - what would be the benefit of getting better information.  This is VoI. 
+. . . 
 
-Example.  Show result from Prob 1wsa - looks like varying ? within plausible range has more of an effect than. 
+A different (related) question: "what would be the benefit of getting better information". 
 
-A different way to ask this...
+**Value of Information** analysis
+
+[Example - connect to a result from probabilistic 1 way SA.  Looks like varying ? within plausible range has more of an effect than... so we might want to get better info ] 
 
 
 # Value of Information 
 
 How much more precise would x get... 
 
-if we were to learn the exact value of ? 
+if we were to learn some parameter exactly
 
 * Expected value of partial perfect information
 
-if we did a study of ?? people
+if we designed a study of ?? people
 
 * Expected value of sample perfect information
 
-Key point is that we don't know the value, or the result of the study, when we calculate this --- so we calculate an _expected_ value, given what is currently known
+. . . 
 
-Aim is to  prioritise further research to reduce uncertainty 
+Key point: we don't know the parameter exactly, or the result of the study, when we calculate this --- so we calculate an _expected_ value, given what is currently known
 
-Study design  [ advanced, not discussed ] 
+Helps us to **set research priorities** to reduce uncertainty, and **design studies** (more advanced)
 
 
-# What does this have to do with "value" 
+# Value of Information in terms of health economics
 
-Slide to explain connection to health economic modelling 
+Value of Information analysis has mainly been used in **health economics** where we model a health policy decision and its consequences e.g. health benefits as QALYs
 
-Information has value - reduces uncertainty - better informed policy making 
+* Information has value $\rightarrow$ reduces uncertainty $\rightarrow$ better informed policy making $\rightarrow$ health benefits
 
-Can go further and model the policy and its consequences 
+* Used a lot in "health technology assessment", seldom in health impact modelling, where models used more for scenarios than policies
 
-decisions lead to e.g. health benefits, but have costs Done in health
-technology assessment, but not so much in health impact modelling [
-advanced not discussed ]
+. . . 
 
-So what is the point in talking about "value" if we don't model the policy? 
+So why talk about "value", if we don't model the policy? 
 
-Define value as "precision of estimate" (better knowledge assumed to eventually have benefits)
 
-Technical benefit - same computational tools developed for health economics can be uased 
+# Precision as value  
+
+Define value as "precision of estimate" 
+
+* More precise estimates assumed to ultimately lead to benefits
+
+* Technical benefit: we can use tools to compute VoI developed for health economic decision modelling 
+
+* We can describe precision benefits of extra information, though hard to trade off formally with costs of research (willingness to pay for more precise estimates?)
 
 
 
@@ -302,12 +451,12 @@ Recommend "earth" method
 
 # Presenting conclusions of EVPPI analysis 
 
+Tornado-like plots, with grouped parameters 
 
 
 # Practical session 
 
 ... Use of "voi" package
-
 
 
 
