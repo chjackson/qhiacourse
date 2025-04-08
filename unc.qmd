@@ -18,6 +18,51 @@ format:
 <!-- https://github.com/ITHIM/ITHIM-R/tree/simple -->
 
 
+<!-- 
+
+Paper example 
+Scenario where pm2.5 pollution emissions from transport D x less 
+Incidence of stroke 
+Pars: 
+
+* background conc mu
+* prop pi due to transport 
+* linear rel between change in emissions and change in conc, 
+  background in scen then mu*(pi*D + (1 - pi))
+* baseline incidence I0, exp cases per year 
+* dose response g2(x,d) for exposure x and pars d 
+* rel incidence R = g2(scen conc, d) / g2(base conc, d)
+* reduction is I0 - I0*R
+
+Uncs.
+Background: lognormal with given CI 
+Pi-transport: beta dist 
+Relative risk from a statistical model with 
+
+"[pars] estimated from data given by the published relative risks at
+different exposures x. A sample from the joint distribution for d was
+obtained by repeating this estimation with alternative plausible
+relative risks simulated using the published estimates and their
+standard errors" 
+
+huh. could use as an example of an adhoc unc calculation 
+is it a bootstrap 
+more like a meta analysis 
+or is it like a deterministic model in itself 
+like nonlin pars = g( pub RRs ) and pub RRs are uncertain
+g is best fit line 
+Thing this excludes is unc about fitted curve given specific RRs 
+howd i do it??  like a bayes meta analysis 
+
+Could represent by a multivariate normal rather than sample -- may be clearer??
+yeah start there for teaching --- illustrates that pars correlated -- log scale 
+
+
+--> 
+
+
+
+
 # Uncertainty in HIA models: Summary of lecture
 
 * Parametric models --- definitions
@@ -35,7 +80,7 @@ format:
 
 Models approximate process that generates some output of interest, helping to inform decision-making.
 
-Example: ITHIM health impact model [ TODO picture ]
+Example: ITHIM health impact model [ TODO borrow picture ]
 
 * inputs: travel data, air pollution, physical activity, injuries, + scenarios of change
 
@@ -66,23 +111,24 @@ Model input parameters: examples
 
 . . .
 
-These are **representations of knowledge** about a population.
+These are **representations of knowledge** about a <small>(real or imagined)</small> population.
 
 We can usually conceive parameters as *summaries* of individual quantities over a large/infinite "population". 
 
 <!-- [ group discussion, exercise, describe the population??  ?? ] 
 
-ans: 
+Ans: 
+
 * exposure is exposure for an individual of given kind over time and space - actual exposures will vary 
 
 * (number of disease cases in a population with exposure 1 / size of this population) / 
 * (number of disease cases in a population with exposure 1 / size of this population)
 
+Any teaching material from Gelman?  G+H?
+
 -->
 
-Parameters $\rightarrow$ model outputs:  
-
-* In public health, usually interested in summaries over a population (or contrasts between sub-populations)
+Model input parameters $\rightarrow$ model output quantities. In public health, model outputs are also usually summaries over populations
 
 
 <!-- Premise of lecture... --> 
@@ -100,7 +146,7 @@ Knowledge is often uncertain $\rightarrow$
 
 Example parameters, for some population
 
-* Background exposure to PM2.5.  
+* Background exposure to PM2.5.
 
 * Risk of death within one year.
 
@@ -367,7 +413,7 @@ In standard "tornado plots" we vary one parameter at a time
 
 # Value of Information 
 
-Recall  
+Recall
 
 * sensitivity analysis: "what if model was a bit different" 
 
@@ -414,7 +460,7 @@ Value of Information analysis has mainly been used in **health economics** where
 So why talk about "value", if we don't model the policy? 
 
 
-# Precision as value  
+# Precision as value
 
 Define value as "precision of estimate" 
 
@@ -426,13 +472,23 @@ Define value as "precision of estimate"
 
 
 
-# Expected value of partial perfect information
+# Expected value of partial perfect information (value = precision)
 
-Also called the "main effect" in computer model sensitivity analysis literature
+Model $Y = g(X_1, X_2,.. )$ with some (scalar) output $Y$ and multiple inputs $X_r$
 
-Formal definition - expected reduction in variance
+We do uncertainty analysis: define distributions for each $X_r$, obtain distribution for $Y$ via Monte Carlo simulation.
 
-Illustration with a scatterplot 
+$var(Y)$: variance of model output under uncertainty
+
+**Definition** - expected reduction in this variance if we were to learn the exact value of $X_r$ (say)
+
+$$var(Y) - E_x(var(Y | X_r = x))$$
+
+We don't know the value of $X_r$ when we calculate this --- so we must take the **expectation** over possible values $x$ (using the distribution we defined)
+
+
+# Illustration of EVPPI
+
 
 
 # Computing the EVPPI 
@@ -465,6 +521,18 @@ Tornado-like plots, with grouped parameters
 Pointers to resources to learn more about 
 
 * VoI in decision models [ book but HTA-focused ] 
+
+
+<!-- 
+**General definition**
+
+Model is used to make a decision 
+
+Expected (over current knowledge) of
+(net benefit with current information - 
+net benefit if learn the value of a parameter)
+--> 
+
 
 * Expected value of sample information [ note done in decision models, see book, but not HIA. ]. 
 

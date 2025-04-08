@@ -1,0 +1,728 @@
+---
+title: Modelling incomplete data in life tables using Bayesian methods
+author: Christopher Jackson<br>MRC Biostatistics Unit, University of Cambridge
+email: chris.jackson@mrc-bsu.cam.ac.uk
+format:
+  revealjs: 
+    embed-resources: true
+    slide-number: true
+    incremental: true
+    preview-links: auto
+    theme: styles.scss
+---
+
+
+# Data required for diseases in health impact models
+
+Relatively easy to 
+
+* count deaths in the general population (**mortality**).
+
+   - though **cause of death** is a harder concept to define and count...
+
+* count how many people have a disease (**prevalence**) 
+
+
+. . . 
+
+Less easy to measure (e.g. cohort studies more expensive than surveys)
+
+* risk of getting a disease [over a period of time] (**incidence**) 
+
+* risk of death for a person with a given disease (**case fatality**) 
+
+* how all these quantities vary in population subgroups 
+
+
+# Overview of lecture 
+
+Multistate lifetable models and typical sources of data 
+
+* e.g. Global Burden of Disease study
+
+Methods for inferring e.g. incidence, remission, case fatality 
+
+* when these not observed directly, but we have observed prevalence, mortality 
+
+* Statistical inference, uncertainty quantification, Bayesian methods...
+
+The `disbayes` R software - practical exercise 
+
+
+
+
+# Multistate lifetable model 
+
+:::: {.columns}
+
+::: {.column width="55%"}
+
+```{r, engine = 'tikz'}
+\newcommand{\y}{\mathbf{y}}
+\newcommand{\x}{\mathbf{x}}
+\usetikzlibrary{calc,fit,positioning,arrows,shapes,backgrounds}
+\tikzset{>={latex}}
+\definecolor{deepskyblue}{rgb}{0, 0.75, 1}
+\tikzstyle{node} =[minimum width = 2cm, font=\small, align=center]
+\tikzstyle{state}    = [node, rectangle, rounded corners, fill=deepskyblue]
+\tikzstyle{alab} =[font=\small]
+\tikzstyle{group}= [rectangle, rounded corners, inner sep=5pt, fill=lightgray!15]
+\begin{tikzpicture}[]
+% \node [anchor=west] (dislab) at ($(rflab) + (5, 0)$) {Disease incidence and mortality models};
+\node (No IHD) [state, anchor=west] {No IHD};
+\node (No stroke) [state, below=of No IHD] {No stroke};
+\node (No dementia) [state, below=of No stroke] {No dementia};
+\node (No lung cancer) [state, below=of No dementia] {No lung cancer};
+
+\node (IHD) [state, right=of No IHD ] {IHD};
+\node (Stroke) [state, below=of IHD] {Stroke};
+\node (Dementia) [state, below=of Stroke] {Dementia};
+\node (Lung cancer) [state, below=of Dementia] {Lung cancer};
+
+\node (Die from IHD) [state, right=of IHD] {Die from IHD};
+\node (Die from stroke) [state, right=of Stroke] {Die from stroke};
+\node (Die from dementia) [state, right=of Dementia] {Die from dementia};
+\node (Die from lung cancer) [state, right=of Lung cancer] {Die from lung cancer};
+\node (Die from other cause) [state, below=of Die from lung cancer] {Die from other cause};
+
+\draw[->] (No IHD) -- (IHD)           node [midway, above, alab] {$\lambda_I(\x)$}; 
+\draw[->] (No stroke) -- (Stroke)     node [midway, above, alab] {$\lambda_S(\x)$};
+\draw[->] (No dementia) -- (Dementia) node [midway, above, alab] {$\lambda_D(\x)$};
+\draw[->] (No lung cancer) -- (Lung cancer) node [midway, above, alab] {$\lambda_L(\x)$}; 
+\draw[->] (Lung cancer) -- (No lung cancer) node [midway, below, alab] {$r_L(\x)$}; 
+
+\draw[->] (IHD) -- (Die from IHD)                  node [midway, above, alab] {$\mu_I(\x)$};
+\draw[->] (Stroke) -- (Die from stroke)            node [midway, above, alab] {$\mu_S(\x)$};
+\draw[->] (Dementia) -- (Die from dementia)        node [midway, above, alab] {$\mu_D(\x)$};
+\draw[->] (Lung cancer) -- (Die from lung cancer)  node [midway, above, alab] {$\mu_L(\x)$};
+
+\begin{scope}[on background layer] %% so plate colour goes under nodes
+  \node[group, fit={(No IHD) (Lung cancer) }] (aliveplate) {};
+\end{scope}
+
+\draw[->, color=gray, out=270, dashed] (aliveplate.south) to [in=180] node [midway, above, alab, color=black] {$\lambda_O(\x)$} (Die from other cause.west);
+\end{tikzpicture}
+```
+
+:::
+
+::: {.column width="45%"}
+Key assumption:  *probability of death from other cause is independent of disease status* 
+
+* Include all diseases relevant to health impact question
+
+* Each disease-specific model determined independently given cause-specific mortality data
+
+* Models combined assuming independence (ref Belen's bit)
+
+:::
+
+::::
+
+
+
+# In this talk: disease specific models 
+
+Consider diseases independently of each other and aim to obtain this model 
+
+```{r, engine = 'tikz'}
+\usetikzlibrary{calc,fit,positioning,arrows,shapes,backgrounds}
+\tikzstyle{state} =[draw, rectangle, minimum size = 1cm, text width=2cm, font=\normalsize, align=center, rounded corners, fill=lightgray!5]
+\begin{tikzpicture}
+\node (health) [state] {1. Disease-free};
+\node (disease) [state, right = of health] {2. Disease};
+\node (death) [state, right = of disease ] {3. Death};
+
+\draw [->] ($(health.east)+(0cm,0.1cm)$) -- ($(disease.west)+(0cm,0.1cm)$) ; 
+\draw [->] ($(disease.west)-(0cm,0.1cm)$) -- ($(health.east)-(0cm,0.1cm)$) ; 
+\draw [->] (disease) -- (death); 
+
+\coordinate (mid) at ($(health.east)!0.5!(disease.west)$);
+\coordinate (mid2) at ($(disease.east)!0.5!(death.west)$);
+
+\node[above=0.2cm of mid] (inc) {$q(a)$};
+\node[below=0.2cm of mid] (inc) {$r(a)$};
+\node[above=0.2cm of mid2] (inc) {$f(a)$};
+\end{tikzpicture}
+```
+
+* Age-specific incidence $i(a)$, remission rate $r(a)$ and case fatality $f(a)$
+
+* *Rate*: expected number of events per person-time of follow-up
+
+  * Describes individual progression in *continuous time*, but we will apply it to data observed in *discrete* time (years) 
+
+* Rates let you **simulate** data over time -- prevalence doesn't
+
+
+# Sources of data 
+
+Varies with the setting but...
+
+**Population mortality** data (by cause) 
+
+*  common from national administrative data
+
+**Prevalence** of a disease
+
+* commonly available from survey data
+
+**Incidence** and **case fatality** less common (e.g. cohort studies)
+
+<small>
+<b>Note the distinction:</b><br>
+**mortality**: number of deaths from disease / people in the population<br>
+**case fatality**: number of deaths from disease / people with the disease
+</small>
+
+. . .
+
+# **Global Burden of Disease** study 
+
+<small>(Institute for Health Metrics and Evaluation, Washington, Seattle, USA)</small>
+
+Publishes estimates every few years (most recently 2021) of 
+
+* incidence, prevalence, cause-specific mortality, etc.
+
+* for most countries, sometimes for regions within countries, by age, sex <small>[ will Belen cover this?]</small>
+
+. . .
+
+Produced from a complex <small>(opaque)</small> statistical model, which aims to ensure
+
+* *consistency* between different sources of data on the same quantity
+
+* *comparability* between different (e.g.) countries: differences due to real differences in populations, not due to biases / noise in data 
+
+
+# Tools for statistical modelling 
+
+Global Burden of Disease study also published methodology and software for 
+estimating disease burden
+
+* `DisMod II` software and paper <small>Barendregt et al. (2003) <em>A generic model for the assessment of disease epidemiology: the computational basis of DisMod II</em>, Pop. Health Metrics</small>
+
+* `DisMod-MR` software and related textbook <small>Flaxman (2015) "An integrative metaregression framework for descriptive epidemiology"</small>
+
+. . . 
+
+Our group <small>(MRC-BSU / MRC Epi)</small> developed an R package and methodology inspired by these, but open-source, comprehensively documented and accessible: `disbayes`
+
+<small>Jackson, Zapata-Diomedi & Woodcock (2023) "Bayesian multistate modelling of incomplete chronic disease burden data" (J Royal Stat Stoc A)</small>
+
+
+# Outline of rest of talk 
+
+`disbayes` model and software for estimating disease transition rates 
+
+* Statistical principles behind the model
+
+* Different assumptions that can be made  
+
+* Using the R package 
+
+* Practical exercises
+
+
+
+# Statistical modelling principles 
+
+```{r, engine = 'tikz'}
+\usetikzlibrary{calc,fit,positioning,arrows,shapes,backgrounds}
+\tikzstyle{state} =[draw, rectangle, minimum size = 1cm, text width=2cm, font=\normalsize, align=center, rounded corners, fill=lightgray!5]
+\begin{tikzpicture}
+\node (health) [state] {1. Disease-free};
+\node (disease) [state, right = of health] {2. Disease};
+\node (death) [state, right = of disease ] {3. Death};
+
+\draw [->] ($(health.east)+(0cm,0.1cm)$) -- ($(disease.west)+(0cm,0.1cm)$) ; 
+\draw [->] ($(disease.west)-(0cm,0.1cm)$) -- ($(health.east)-(0cm,0.1cm)$) ; 
+\draw [->] (disease) -- (death); 
+
+\coordinate (mid) at ($(health.east)!0.5!(disease.west)$);
+\coordinate (mid2) at ($(disease.east)!0.5!(death.west)$);
+
+\node[above=0.2cm of mid] (inc) {$q(a)$};
+\node[below=0.2cm of mid] (inc) {$r(a)$};
+\node[above=0.2cm of mid2] (inc) {$f(a)$};
+\end{tikzpicture}
+```
+
+Aim to estimate the **parameters**, age-specific rates $i(a)$, $r(a)$, $f(a)$ 
+
+* considered as summaries of an infinite population 
+
+. . . 
+
+...given **observed data**, are assumed to be generated randomly from a statistical model with these parameters 
+
+* dataset considered uncertain: *finite* and potentially *biased* population
+
+
+# Statistical inference: Bayesian methods 
+
+
+:::: {.columns}
+
+::: {.column width="55%"}
+
+* Parameters $\theta$ considered to have *probability distributions*
+
+* Start with a *prior* distribution $p(\theta)$, update with evidence from the data *likelihood* $f(y | \theta)$, producing the *posterior* $p(\theta | y)$ 
+
+* Shows *uncertainty*, and how it is reduced with information 
+
+:::
+
+
+::: {.column width="45%"}
+
+<small><b>Example</b>: posterior for a proportion (e.g. disease prevalence).<br>
+Start with a $Beta(a=1,b=1)$ prior<br>
+Observe $r$ cases out of $n$ people ("binomial" likelihood)<br>
+Get a $Beta(a+r,b+n-r)$ posterior distribution 
+</small>
+
+![](plots/prior_post.png)
+
+:::
+
+::::
+
+
+<!--
+# Frequentist statistical inference 
+
+e.g. **maximum likelihood**: estimate parameters for which likelihood (probability of data) is highest 
+
+* "Frequentist" conception of uncertainty from sampling a finite dataset from the wider population (standard errors, confidence intervals, "bootstrap" estimation...)
+
+* Often test hypotheses about different parameter values 
+
+(won't discuss further) 
+-->
+
+
+# What exactly are our data here? 
+
+We have at least prevalence, cause-specific population mortality, possibly also incidence and/or remission, all by age. 
+
+For statistical inference, must acknowledge the data are summaries of a finite population, so come with some **uncertainty**
+
+For this method, disease data must come in either of two forms:
+
+(a)  **estimate and credible interval**: <em>"prevalence of dementia <small>in men aged 80</small> is 10%, with 95% credible interval of (8%--12%)"</em>
+
+(b) **event count and denominator**: <em>"out of 1000 <small>men aged 80</small> in the area, 100 have dementia"</em>
+
+. . .
+
+We now show these two forms are roughly equivalent - so can convert between them
+
+
+# Rough equivalence between counts and credible intervals for proportions 
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+Posterior distribution, given count of $r$ events out of denominator $n$, 
+<small>and a weak $Beta(0,0)$ prior,</small> is $Beta(r, n-r)$ 
+
+Posterior mean (best estimate): $r/n$<br>
+Posterior SD: known function of $r,n$. 
+
+95\% credible interval has width $\approx 4 \times$ SD
+
+:::
+
+::: {.column width="50%"}
+![](plots/count_prop.png)
+
+Given estimate and a CI, can deduce the count $r$ and denominator $n$ 
+<small>(software can do this)</small>
+
+:::
+
+::::
+<br><small>(could also use $Beta(1,1)$ prior and $Beta(r+1,n-r+1))$ posterior</small>
+
+
+# Disaggregating age groups to year of age 
+
+* Health impact models typically have a time unit of 1 year of age 
+
+* Disease data often come in age groups, rather than by year of age 
+
+. . . 
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+
+Suppose we have an estimate of 0.1 (95\% CI 0.08 to 0.12) for a disease prevalence
+in age group 55-59
+
+**Convert to a count**: 100 cases out of 1000. 
+
+Easiest to assume equal spread 
+
+:::
+
+::: {.column width="50%"}
+
+
+::: {#bitsmaller}
+| Age | Cases | Sample size |
+|---------|:-----|------:|
+| 55      | 20   |  200  |
+| 56      | 20   |  200  |
+| 57      | 20   |  200  |
+| 58      | 20   |  200  |
+| 59      | 20   |  200  |
+:::
+
+Acknowledges year-specific data are from smaller sample size
+
+::: 
+
+:::: 
+
+. . .
+
+
+[More advanced: make counts smoothly varying by age. Can use R `tempdisagg` package.  See the disbayes vignette]{style="font-size: 16pt"}
+
+
+
+# Case study: ischaemic heart disease in Bristol, England
+
+
+:::: {.columns}
+
+::: {.column width="25%"}
+Estimates and credible intervals from Global Burden of Disease, converted to counts.   
+
+Aim to deduce case fatality rates from these
+:::
+
+::: {.column width="75%"}
+![](plots/ihdbristol_data.png)
+:::
+
+::: {#small12}
+(available in the `disbayes` package in the `ihdengland` dataset)
+:::
+
+::::
+
+
+
+# Remission rates
+
+TODO 
+
+
+10-year survival probabilities published for cancers 
+
+Convert to annual probabilities with some assumption on uncertainty
+
+Example
+
+
+# Theory 
+
+Each count data-point $r^{(...)}$ with denominator $n^{(...)}$ comes from a Binomial distribution with some probability $p^{(...)}$: 
+
+:::: {.columns}
+
+::: {.column width="50%"}
+::: {#bitsmaller}
+
+| Measure | Number of people of age $a$... | Probability $p^{(...)}$ |
+|-----|:------|--:|
+| Prevalence      | with the disease   |  $p^{(prev)}$  |
+| Incidence      | getting the disease before $a+1$   |  $p^{(inc)}$  |
+| Cause-specific mortality  | dying from the disease before $a+1$   |  $p^{(mort)}$  |
+
+:::
+:::
+
+::: {.column width="50%"}
+
+$p^{(prev)},p^{(inc)},p^{(mort)}$ are all deterministic functions of the **transition probability matrix** $P_j$ for ages $j=0,...,a$
+
+::: {#bitsmaller}
+$P_j$: matrix with $(r,s)$ entry: probability person is in state $s$ at age $j+1$, given they are in state $r$ at age $j$. <br>
+Deterministic function of the *rates* $i(a), f(a),...$
+:::
+
+So given all count data $r^{(...)},n^{(...)}$, we can estimate the rates 
+
+::: 
+::::
+
+## Recap of statistical inference, and algorithms for parameter estimation
+
+We assume "our data $X$ were generated from a model with parameters $\theta$
+
+Statistical inference works backwards: then given $X$ we infer 
+what parameters $\theta$ are most likely to have generated that data 
+
+*Bayesian inference*: use a procedure called *Markov Chain Monte Carlo* to sample a sequence of parameters from the posterior distribution.
+
+*Approximate Bayesian inference*: use optimisation to find the peak of the posterior, then approximate the shape.  At least 10 x quicker.
+
+`disbayes` R package uses the `Stan` software as an engine to do this
+
+
+# What does it give you then 
+
+TODO Show picture of a distribution --- not just a best estimate but uncertainty 
+
+
+# Example 
+
+
+:::: {.columns}
+
+::: {.column width="35%"}
+Estimate the unknown case fatality rates $f(a)$ for each age $a$ from this model.
+
+Assume $f(a)$ are independent for each age, with vague prior distributions.
+:::
+
+::: {.column width="65%"}
+![](plots/ihdbristol_cfindep.svg)
+:::
+
+
+::::
+
+. . .
+
+Problem is that very few get IHD below age 50, so no information on case fatality
+
+Can do better by adding plausible assumptions... 
+
+
+# Extension: smooth change with age 
+
+
+
+:::: {.columns}
+
+::: {.column width="35%" #bitsmaller}
+Assume rates are **smooth functions of age**
+
+* This is implemented in `disbayes` as a *spline* function
+
+* Allows data from one age to give information about nearby ages
+
+* More efficient use of data $\rightarrow$ more precise estimates
+
+
+::: {.fragment}
+Below age 40, also assume rates are **equal** for all ages
+:::
+
+:::
+
+::: {.column width="65%"}
+![](plots/ihdbristol_cfsmooth.svg)
+:::
+
+
+::::
+
+
+
+
+# Combinations of data 
+
+**Minimum required data**: mortality, plus one of prevalence or incidence as counts
+
+* Could also have both prevalence *and* incidence, and remission if assumed
+    
+* all supplied as counts 
+
+. . .
+
+The model will **estimate** posterior distributions for incidence rates and case fatality rates (and remission if assumed) which **best fit** the data supplied
+
+However... **in practice**, estimates will not be precise if data are weak
+
+*  or computation may even fail due to no valid "best estimate"
+
+. . . 
+
+Constraints should be used wherever plausible...
+
+
+# Problems and solutions: rarer diseases
+
+
+:::: {.columns #bitsmaller}
+
+::: {.column width="50%"}
+Example: stomach cancer, incidence $0-5$ cases (out of 5000) per year of age, compared to 10-50 for IHD.
+
+Attempting to fit model with smooth functions of age, assuming rates equal below age 40, fails <small>(incomprehensible error caused by failure to find a "best estimate")</small>
+
+:::  {.fragment}
+Resolved by imposing tighter constraints, e.g. case fatality rates are...
+
+* equal below age 70, instead of $\leq$ age 40
+
+* or constant for all ages,
+
+* or increasing for all ages? 
+
+:::
+
+:::  {.fragment}
+Or could aggregate data to a larger area, e.g. assuming rates for one city in England are the same as for the whole of England. 
+:::
+
+:::
+
+::: {.column width="50%"}
+![](plots/scbristol_data.svg)
+:::
+
+::::
+
+<!--
+There are computational tweaks, but safer to simplify the model or aggregate the data
+* Any need to tweak default priors encountered in the paper? 
+* What about the EB method
+* MCMC may behave better than optimisation - also better for unc 
+--> 
+
+
+# Problems and solutions: inconsistency between data (a)
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+The model estimates incidence + case fatality *rates* that **best fit** all available *count* data (prevalence, incidence)
+
+Including current prevalence and current incidence in the same model assumes they are *consistent*
+
+But current prevalence and mortality are consequences of of *past* incidence: has incidence changed over time?
+
+:::
+
+::: {.column width="50%"}
+![](plots/conflict.svg)
+:::
+
+::::
+
+# Problems and solutions: inconsistency between data (a)
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+**Right:** estimates of incidence are different if we base these on 
+
+* current prevalence + incidence (i.e. averaging past and current incidence)
+
+* current prevalence only (past incidence) 
+
+* current incidence data only
+
+:::
+
+::: {.column width="50%"}
+![](plots/conflict.svg)
+:::
+
+::::
+
+
+
+# Problems and solutions: inconsistency between data (b)
+
+If there is evidence of conflict between data sources --- use the most relevant / trustworthy source
+
+* e.g. use observed incidence in your lifetable model, rather than modelled estimates 
+
+* <b>Advanced:</b> `disbayes` model can adjust for time trends in incidence and case fatality rates, though challenging in practice 
+
+    * difficult to determine trends precisely from literature
+
+    * model adjustment is computationally intensive
+
+
+
+# Modelling multiple populations 
+
+* Fit a separate `disbayes` model for men and women, and for each
+  different area of interest (regions of a country)
+
+* <b>Advanced</b> alternative: `disbayes` can fit a **hierarchical** model
+
+    * Estimates from areas with smaller sample sizes (noisier data) are smoothed towards estimates from larger areas
+
+	* Computationally intensive
+
+    * Separate models for female/male, or one model with a "gender effect" independent of area
+
+
+
+# Calling the package 
+
+TODO 
+
+Or better to put this earlier .  Coordinate with practical sessions 
+
+Input 
+
+* Data and names of variables 
+
+* Model assumptions 
+
+* Approximate or full uncertainty
+
+Output 
+
+Posterior -- tidy estimates 
+
+Examples of plots 
+
+[tuning is advanced for this]
+
+
+# Final discussion, limitations 
+
+TODO
+
+* Proportional multistate, cause of death assumptions, modelling other-cause
+
+* Markov assumption. Model acute events e.g. (MI and stroke) separately.
+
+* Microsimulation is more flexible 
+
+
+# Practical example - do it yourself 
+
+TODO coordinate with Belen.  Intersperse between lectures
+
+* Something to firm up idea of credible intervals versus counts 
+
+	- tricky edge cases may need arbitrary decisions -- calibrate
+	
+* Run disbayes with a different dataset 
+
+    - Common and rare disease 
+	
+* Different combinations of data --- explain differences 
+
+* Model checking and awareness of biases 
+
+* Construct plots and summaries
