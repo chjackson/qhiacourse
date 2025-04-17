@@ -1,4 +1,15 @@
 /*-- scss:defaults --*/
+
+$body-bg: #f2f3f8 !default;
+
+$presentation-font-size-root: 35px;
+
+$presentation-h1-font-size: 1.6em;
+
+
+
+/*-- scss:rules --*/
+
 strong {
     color: #A020F0;
 }
@@ -10,15 +21,20 @@ em {
     color: #3250A8;
     font-weight: bold;
 }
-$body-bg: #f2f3f8 !default;
 
-$presentation-font-size-root: 35px;
-
-$presentation-h1-font-size: 1.6em;
+#small22
+{
+    font-size: 22pt;
+}
 
 #bitsmaller
 {
     font-size: 20pt;
+}
+
+#small18
+{
+    font-size: 18pt;
 }
 
 #small16
@@ -35,3 +51,9 @@ $presentation-h1-font-size: 1.6em;
 {
     font-size: 6pt;
 }
+
+.reveal pre code {
+    font-size: 18pt;
+    background-color: #aef5c9;
+}
+

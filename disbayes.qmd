@@ -284,7 +284,7 @@ Observe $r$ cases out of $n$ people ("binomial" likelihood)<br>
 Get a $Beta(a+r,b+n-r)$ posterior distribution 
 </small>
 
-![](plots/prior_post.png)
+![](plots/prior_post.svg)
 
 :::
 

@@ -14,20 +14,22 @@ p <- ggplot(dat, aes(x=x,y=y10)) +
   geom_ribbon(aes(ymax=yprior, ymin=0), fill="gray60") +
   geom_ribbon(aes(ymax=y10, ymin=0), fill="blue", alpha=0.5) +
   geom_ribbon(aes(ymax=y100, ymin=0), fill="darkblue", alpha=0.5) +
-  annotate(geom="text", x=0.6, y=1.5, label="Prior (Beta(1,1))", col="gray60") +
-  annotate(geom="text", x=0.5, y=2.5, label="Posterior with 2 cases out of 10: Beta(1+2, 1+8)", col="blue") +
-  annotate(geom="text", x=0.3, y=6.5, label="Posterior with 20 cases out of 100: Beta(1+20, 1+80)", col="darkblue") +
+  annotate(geom="text", x=0.7, y=1.5, hjust=0, size=6,
+           label="Prior (Beta(1,1))", col="gray60") +
+  annotate(geom="text", x=0.32, y=3, hjust=0, size=6,
+           label="Posterior with 2 cases\nout of 10: Beta(1+2, 1+8)", col="blue") +
+  annotate(geom="text", x=0.25, y=6.5, hjust=0, size=6,
+           label="Posterior with 20 cases\nout of 100: Beta(1+20, 1+80)", col="darkblue") +
   xlim(0,1) +
   ylim(0,max(dat$y100)) +
   ylab("Probability density") +
   xlab("Disease prevalence") +
   theme(axis.text = element_text(size=20),
         axis.title = element_text(size=20))
-ggsave("plots/prior_post.png")
+svg("plots/prior_post.svg")
 p
 dev.off()
 
-p + geom_area(mapping = aes(y = ifelse(x>0.5, y, 0)), fill = "red")
 
 
 ## Counts and proportions equivalence

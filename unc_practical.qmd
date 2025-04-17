@@ -1,0 +1,128 @@
+---
+title: Uncertainty in quantitative health impact modelling: practicals
+author: Christopher Jackson<br>MRC Biostatistics Unit, University of Cambridge
+email: chris.jackson@mrc-bsu.cam.ac.uk
+format:
+  revealjs: 
+    embed-resources: true
+    slide-number: true
+    incremental: true
+    preview-links: auto
+    theme: styles.scss
+---
+
+
+
+
+# What is a parameter 
+
+Suppose we want to estimate the following parameters to include in a health impact model.
+
+In an ideal world where we can measure anything, what would we measure, on what individuals?  How would we summarise the individual-level measurements to estimate the parameter? 
+
+* background/baseline exposure to PM2.5
+
+* relative risk of lung cancer for one unit increase in exposure to PM2.5
+
+* the incidence of a disease 
+
+* the mortality rate for people with a disease 
+
+
+<!-- Mine Anna's paper for harder examples -->
+
+
+# Variability versus uncertainty 
+
+Which of these things are individual-level variability? [some]
+Which are subject to uncertainty [all?]
+Surely all and all if they are an empirical average, perhaps small ignorable 
+
+Need clearer way to teach -- learning point could be that we are free to model indiv unc but it may not matter for a population model.  Knowledge unc and heterogeneity are more important
+
+What if interested in variance over subgroups - heterogeneity, new concept 
+
+Something to do with individual travel - survey data 
+
+time travelled in a week for the 237th person in the synthetic population 
+
+average time travelled for 30 year old women 
+
+average speed of cars in Cambridge
+
+for person with same characteristics as 237th person, median amount of time travelled by bike in one week
+
+total amount of 
+
+proportion of cyclists that are male 
+
+MET for an activity
+
+Why are we teaching this?  does it come into synthetic pop thign. 
+yes it comes into METs 
+237th person has travel times simulated, assigns METs, exposures for those times
+Get a total exposure over the population 
+and a variance in exposure over the pop 
+do we assign indiv MET randomly given travel time 
+then where does the transformation come from.  Mean is published 
+published individual SDs.  convert to population 
+
+
+# Getting uncertainty from statistical models
+
+We published the 
+
+Test interpreting credible intervals, SEs etc 
+
+Test log transformation 
+
+
+
+# Simple examples of propagating uncertainty
+
+e.g. with cars vs trucks, speed etc 
+
+or MET thing 
+
+
+
+# Log normal distributions 
+
+
+A paper publishes MET with an estimate and a standard deviation between individuals
+[of a particular population, test] 
+
+Derive the log normal distribution for the indivudual-level MET 
+
+Give two reasons why this might be unsuitable for use as a distribution in our health impact model
+
+(a) It is the distribution over individuals, not the uncertainty about the average value in a population 
+
+(b) It may be describing a different population 
+
+We make a judgement for our context that it may have up to ?? and up to ?? 
+
+Derive the log normal distribution (answer by transforming the est and CI and deriving the normal from the CI width) 
+
+Or do it with the upper and lower limit.  Then compare.  Teaching point is that it probably doesn't matter how you do it.  Transparency is the key.  Just use the measure that you are most confident about and calibrate if needed
+
+Credible interval is 4 times the SD for a normal 
+
+
+
+
+# Beta distributions
+
+
+* LO: get used to using dpqr functions for beta 
+
+* Try a thing multiple ways, get similar answers.   LO doesn't matter
+
+
+
+
+# Monte Carlo
+
+* LO: doing MC in R.  Calculate a thing that can only be done with MC. Very simple HI model e.g. from voi hia paper 
+
+* LO - uncertainty affects the best estimate.  Plug ins vs MC.   Perhaps not much but if we can then we should 
