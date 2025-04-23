@@ -16,29 +16,36 @@ format:
 
 <!-- 
 
+Map of presentation. 
+[min] 1 - 10, what is a parameter, what is uncertainty 
+[min] 11 - 20, how to get credible intervals 
+[min] 21 - 26, how to get distributions 
+[min] 27 - 30, Doing Monte Carlo.  SA 
+[min] 32 - 42, VoI 
+
+
+OPPORTUNITIES for interaction 
+* [slide 1] How many of you have done a probabilistic model?
+* [slide 1] How many of you have done one-way sensitivity analysis?
+
+
 TODO 
+
+* How many samples in MC? 
 
 * ITHIM picture
 
 * Work out how to interact on indiv/unc,  unc examples,  whys unc matter 
 
-* examples of stat models in ithim
-
-* examples of judgements in ithim - weave into practical 
-
-* meta analysis slide 
-
-* beta slide is messy 
-
 * UQ practical 
-
-* color on tech point 
-
-* nicen tornado 
 
 * MC practical 
 
 * VoI practical 
+
+* MC animation?
+
+
 
 Paper example 
 Scenario where pm2.5 pollution emissions from transport D x less 
@@ -104,7 +111,8 @@ Models approximate process that generates some output of interest, helping to in
 
 Example: ITHIM health impact model [ TODO borrow picture ]
 
-* **inputs**: travel data, air pollution, physical activity, injuries, + scenarios of change
+* **inputs**: travel data, physical activity, air pollution, traffic injuries<br>
+              scenarios of change in these
 
 * **outputs**: population health (and changes under scenarios)
 
@@ -127,13 +135,13 @@ PA DRFs.
 
 Model input parameters: examples
 
-* background exposure [measures of average e.g. air pollution, physical activity] in an area
+* background exposure, e.g. average levels of an air pollutant, or levels of physical activity [(for some population, area, characteristics)]{#small18}
 
-* relative risk for [health outcome] given [change in AP / exposure]
+* relative risk of getting a disease, given some change in some exposure
 
 . . .
 
-Parameters are **representations of knowledge** about a <small>(real or imagined)</small> population.
+Parameters are **representations of knowledge** about a [(real or imagined)]{#small16} population.
 
 * Usually conceive as *summaries* of individual quantities over a large/infinite "population". 
 
@@ -141,68 +149,33 @@ Parameters are **representations of knowledge** about a <small>(real or imagined
 
 . . .
 
-Model input parameters $\rightarrow$ model output quantities.<br>
-Model outputs are usually summaries over populations
-
+Model transform parameters $\rightarrow$ output quantities.<br>
+Outputs also represent summaries over populations
 
 <!-- Premise of lecture... --> 
-
-# Parameter uncertainty 
-
-Knowledge is often uncertain $\rightarrow$ 
-
-* parameters are uncertain 
-
-* conclusions from models are uncertain 
-
-
-# Individual variability versus uncertainty about knowledge
-
-Example parameters, for some population
-
-* Background exposure to PM2.5.
-
-* Risk of death within one year.
-
-. . .
-
-We may be sure about the values of these.  Even so...
-
-* Exact exposures will be different for each individual
-
-* Some individuals will die within a year, some won't 
-
-. . .
-
-But we may be uncertain about the parameter values.
-
-. . . 
-
-**Individual variability can never be removed, but parameter uncertainty can be reduced with better knowledge**
-
-
-<!-- Exercise to test the difference --> 
 
 
 # Parameters are generally uncertain
 
-Two broad reasons for parameter uncertainty
+Two broad reasons for parameter uncertainty: the parameter estimate is 
 
-* **summary of a limited population**
+* an observed summary of a **limited population**, and/or
 
-* **population is different from the one we want**
+* from a **population that is different from the one we want**
 
 . . .
 
-	- Discuss examples of this 
+<!--	- Discuss examples of this  -->
 	
 <!-- different country. past vs future.  selection bias ---> 
 
 . . .
 
-Models are also uncertain [("structural" uncertainty, "all models are wrong, but some are useful"...)]{#small16}
+**Models are also uncertain** [("structural" uncertainty)]{#small16}
 
-* Ideally quantify as many uncertainties as possible inside the model
+* By definition, model approximates reality [("all models are wrong, but some are useful"...)]{#small16}
+
+* Ideally *quantify* as many uncertainties as possible *inside* the model
 
 <!-- 
 
@@ -218,9 +191,32 @@ could just reiterate that
 
 
 
+
+
+# Individual variability versus uncertainty about knowledge
+
+| Individual-level quantities  |  Parameters |
+| ---  | --- |
+| individual exposure to PM2.5 during a trip | expected exposure to PM2.5 for a trip/individual of this kind |
+| whether this individual dies within a year | risk of death within a year |
+
+. . .
+
+Individual-level quantities are **different for each individual**
+
+Our **knowledge** of parameters may be **uncertain**
+
+. . . 
+
+**Individual variability can never be removed, but parameter uncertainty can be reduced with better knowledge**
+
+<!-- Exercise to test the difference --> 
+
+
+
 # Why does uncertainty matter? 
 
-[ interact ?  ] 
+<!-- [ interact ?  ]  --> 
 
 We've built best model we can.  Just report our "best estimate" to the decision maker? 
 
@@ -256,6 +252,27 @@ Here we will cover **quantitative methods** for assessing uncertainty.  In parti
   Which parameter should we get better information on?
 
 
+
+
+# Uncertainty in microsimulation models 
+
+**(advanced, may remove this slide)**
+
+Microsimulation models create a population of *synthetic* individuals and simulating / summarising quantities of interest
+
+Often based on drawing individuals directly from an *observed* dataset
+
+* [(in contrast with models where inputs and outputs represent population summaries)]{#small18}
+
+. . .
+
+<b>ITHIM:</b> synthetic population of "individuals" (households, people, trips) based on travel survey data.  Exposures assigned to trips.  Health impacts for aggregated age groups. 
+
+::: {.fragment #small18}
+Uncertainty here applies to *individual-level* quantities (e.g. trips taken for a person with given characteristics), and is represented by variability between individuals in the survey data.  *This approach doesn't consider uncertainty about quality/relevance of the travel survey dataset*
+:::
+
+
 # How to quantify uncertainty 
 
 Two broad approaches
@@ -270,7 +287,7 @@ Two broad approaches
 
 . . . 
 
-Our goal in each case is to obtain *probability distributions* for parameters
+Our goal in each case is to obtain **probability distributions** for parameters
 
 * rigorous basis for uncertainty and sensitivity analysis
 
@@ -308,7 +325,7 @@ In statistical models, data assumed to come from models with parameters...
   
 * **Prior distribution** combined with study data $\rightarrow$ **posterior** distribution.
 
-::: {#small16}
+::: {.fragment #small16}
 Prior distribution dominates if data are weak<br>
 Prior doesn't matter if enough data 
 :::
@@ -335,73 +352,95 @@ Prior doesn't matter if enough data
 
     * **Standard error**: variability in estimates between datasets.
 	
-	* **Confidence interval**: contains true value in 95% of draws.
-
+	* **Confidence interval**: contains true value in 95% of datasets drawn
+	
 . . .
 
 If dataset is large, can interpret a frequentist analysis as Bayesian:  parameter has a normal distribution, defined by estimate and standard error
 
 If dataset is small, Bayesian analyses have the benefit of allowing background information to be included as a prior 
 
-# Examples of statistical models informing QHIA 
+
+
+# Examples of statistical models that inform quantitative HIA
 
 **Global**
 
-disbayes informing incidence, CF 
+* Epidemiological models for estimating disease incidence and mortality
 
-Meta analysis of relative risks 
+* Meta-analysis of relative risks (of disease outcomes given different exposures)
+
 
 **Local** 
 
-(transport)
-travel time 
-speeds convert to distances 
+* Road traffic deaths or injuries: count data (e.g. Poisson) regression models of reported incidents by person/vehicle characteristics
 
-Road traffic injury models - Poisson 
+* Models for analysing travel survey data 
 
 
+# Examples of judgements: physical activity 
+
+MMET value for cycle commuting.  Data from Compendium of Physical Activities [(https://pacompendium.com/bicycling/)]{#small16}
+
+![](plots/met_cycling.png){}
+
+Which of these are relevant to our particular health impact model?
 
 
-# Examples of judgements
 
-Example: MMET values for transport-related cycling 
+# Examples of judgements: physical activity 
 
-<!--
-01010 4.0 bicycling bicycling, <10 mph, leisure, to work or for pleasure (Taylor Code 115)
-01011 6.8 bicycling bicycling, to/from work, self selected pace
-01013 5.8 bicycling bicycling, on dirt or farm road, moderate pace
-01015 7.5 bicycling bicycling, general
-01018 3.5 bicycling bicycling, leisure, 5.5 mph
-01019 5.8 bicycling bicycling, leisure, 9.4 mph
-01020 6.8 bicycling bicycling, 10-11.9 mph, leisure, slow, light effort
-01030 8.0 bicycling bicycling, 12-13.9 mph, leisure, moderate effort
-01040 10.0 bicycling bicycling, 14-15.9 mph, racing or leisure, fast, vigorous effort
--->
+:::: {.columns}
 
-Which of these are relevant to our particular health impact model --- pick 6.8 (4, 10) given judgement? 
+::: {.column width="50%"}
+Might judge that code 1011 (MET 6.8) is a typical kind of cycling for our context, and judge a credible interval based on similar kinds of cycling in this table. 
+
+**Rough judgement: no "correct answer"!**
+
+<b>Note:</b> Does the parameter in our model represent the average for some population, or the value for a person / trip?  
+:::
 
 
-# Examples of judgements
+::: {.column width="50%"}
+![](plots/met_cycling.png){width="100%"}
 
-Example: PM2.5 concentration. [SHOW APnA Table 3.]  We have average and SD for 30 cities in India.
+<b>Note also:</b>
+[Each published MMET value is itself an estimate, that conceals variability and uncertainty!]{#small18}
 
-We have average for our city, but we want a measure of uncertainty
+:::
+:::: 
 
-Could choose our SD as average of these SDs (?? geometric average (exp(mean(log))) or median?)
 
-But what do we know about how our city compares to these? 
 
-Is it worth woing into effort to quantify --- start with conservative assessment of uncertainty 
+# Examples of judgements: air pollution
 
-Considerations: 
-* size and quality of data underlying
-* how was it measured
-* relevance of population
-* changes over time
-* changes over space 
+PM2.5 concentration. We know published estimates of average and SD for 30 cities in India.
 
-Where might these come from with no extra info? 
+:::: {.columns}
 
+::: {.column width="50%"}
+Suppose our city is not one of these.  We just know the *average* PM2.5 for our city.  Where do we get a *credible interval* or SD?
+
+::: { #small18}
+Indian data shows a "typical" set of SDs of pollution within cities.   So we might use an average of these SDs.  But...
+
+::: {.fragment}
+
+* What do we know about how our city compares to these? 
+
+* Do we want a measure of uncertainty (about an average) or variability (between points)?
+:::
+:::
+
+:::
+
+::: {.column width="50%"}
+![](plots/india_pm25_data.png)
+[Source: https://urbanemissions.info/wp-content/uploads/apna/docs/2019-07-APnA30city_summary_report.pdf]{#small16}
+
+:::
+
+::::
 
 
 # Meta-analysis 
@@ -411,23 +450,47 @@ Where might these come from with no extra info?
 
 ::: {.column width="50%"}
 
-Formally averaging information from different studies.
-
-Most developed in randomised clinical trials --- highly controlled, regulated studies. 
+Formally averaging a quantity estimated from different studies.
 
 Give more weight to more confident studies and/or those closer to our context.
 
-TODO any resources for MA of clinical trials and epidemiology.  R package at least 
+Most developed in randomised clinical trials --- highly controlled, regulated studies
 
-:::
-
-::: {.column width="50%"}
-PICTURE of meta-analysis 
-
-Uncertainty about a predicted new study -- more appropriate than the average
+::: {#small16}
+see e.g. [https://training.cochrane.org/interactivelearning](https://training.cochrane.org/interactivelearning) for learning resources --- find those about observational studies in epidemiology
 :::
 
 ::: 
+
+::: {.column width="50%" #small18}
+![](plots/ma.svg)
+
+Might summarise the average of the observed studies, or make a prediction for a new study (more uncertain)
+
+If studies disagree, consider why.  Ensure relevant studies selected.
+:::
+
+::: 
+
+
+# Considerations for uncertainty quantification 
+
+**Not always possible to precisely quantify uncertainty**
+
+* Rough, clearly-stated judgement better than ignoring it
+ 
+* Uncertainty about a parameter may or may not affect the uncertainty about a model output [(see "Value of Information", later...)]{#small16}
+
+    - If output is robust to uncertainty, conclusion is strengthened
+
+. . .
+
+When making judgements, consider, e.g.: 
+
+* **quality**/amount of data behind published numbers. how were these numbers obtained?
+
+* **relevance** of population, variations over time / between places
+
 
 
 
@@ -436,6 +499,8 @@ Uncertainty about a predicted new study -- more appropriate than the average
 :::: {.columns}
 
 Suppose we have a parameter with estimate 0, credible interval (-2 to 2)
+
+How to derive a probability distribution that reflects this belief?
 
 ::: {.column width="50%"}
 What is wrong with a distribution like this
@@ -519,11 +584,12 @@ Example: MMET/h estimate 2.5 (CI 1 to 4).
 * Assign normal with SD = CI width / 4
 
 
-::: {.fragment} 
+::: {.fragment #small18} 
 
-If the SD is published, but not the CI, e.g. MMET/h estimate $m=2.5$ (SD $s=1.4$)?  
+If the SD is published, but not the CI<br>
+e.g. MMET/h estimate $m=2.5$ (SD $s=1.4$)?
 
-* _Method of moments_ gets us mean $\mu$ and SD $\sigma$ on log scale 
+_Method of moments_ gets us mean $\mu$ and SD $\sigma$ on log scale 
 
 [$\mu = \log(m/\sqrt{s^2/m^2 + 1}), \sigma= \sqrt{\log(s^2/m^2 + 1)}$]{#small16}
 
@@ -545,29 +611,36 @@ If the SD is published, but not the CI, e.g. MMET/h estimate $m=2.5$ (SD $s=1.4$
 
 :::: {.columns}
 
-::: {.column width="70%"}
+::: {.column width="60%"}
 Used for quantities between 0 and 1: probabilities, proportions
 
-Two "shape" parameters $a,b$. Mean: $a/(a+b)$.
+Defined by "shape" parameters $a,b$
 
-Given an estimate $m$ and credible interval, could approximate SD $s =$ CI width/4 and use method of moments: <small>$a = (m(1-m)/s^2 - 1)m, b = (m(1-m)/s^2 - 1)(1 - m)$</small>
+Given an estimate $m$ and credible interval, how to obtain $a, b$?
+
+::: {.fragment}
+Approximate SD $s =$ CI width/4, then use "method of moments":<br>
+[$a = (m(1-m)/s^2 - 1)m$]{#small16}</br>
+[$b = (m(1-m)/s^2 - 1)(1 - m)$]{#small16}
+:::
 
 ::: {#bitsmaller}
-Example (a): estimate 0.4, 95% CI 0.2 to 0.6
+<!-- Example (a): estimate 0.4, 95% CI 0.2 to 0.6
 
-Example (b): estimate 0.04, 95 %CI 0.01 to 0.4
-
-Distribution (b) is a worse approximation to our desired CI width<br>
-<small>"width/4" heuristic based on symmetric, normal-shaped distributions.<br>
-Could informally calibrate to match desired belief more closely.<br>
-</small>
+Example (b): estimate 0.04, 95 %CI 0.01 to 0.4 -->
+::: {.fragment}
+"SD = CI width / 4" heuristic based on symmetric, normal-like distributions.<br>
+Less accurate in example (b) opposite.<br>
+Could adjust by trial and error to match desired belief more closely.<br>
 :::
 
 :::
 
-::: {.column width="30%"}
+:::
+
+::: {.column width="40%"}
 ![](plots/beta.svg)
-<small>See `SHELF` R package for more sophisticated techniques for fitting distributions</small>
+[See `SHELF` R package for more sophisticated techniques for fitting distributions]{#small16}
 :::
 
 ::::
@@ -607,22 +680,30 @@ Do this with a trivial model eg the voi hia
 
 
 
-# Technical point - uncertainty affects "best estimate" in nonlinear models {.bitsmaller}
+# Technical point - uncertainty affects "best estimate" in nonlinear models
 
-Given a model with inputs $X$ and outputs $Y = g(X)$, where $g()$ is some mathematical function.
+Given a model with uncertain inputs $X$, with expected values $E(X)$<br>
+Outputs $Y = g(X)$ [where $g()$ is function that defines the model]{#small18}
 
-Inputs $X$ are uncertain, with expected values $E(X)$.
+. . .
 
-What is the expected value of $Y$?  Can we just plug in the best
-estimates of the inputs $g(E(X)$? 
+What is $E(Y)$, the expected value of $Y$?  
 
-$E(Y)$ is only equal to $g(E(x))$ if the function $g()$ is **linear**:
+. . .
 
-$$g(E(x)) = g((X_1 + \ldots + X_n)/n) = $$ (if $g()$ linear...)
+Can we just plug in the best estimates of the inputs, as $g(E(X))$? 
 
-$$(g(X_1) + \ldots + g(X_n)) / n = E(g(X)) = E(Y)$$ 
+. . .
 
-Most realistic models are **non-linear*: need Monte Carlo simulation to get the true expectation of the output. 
+
+$E(Y)$ only equals $g(E(X))$ if the function $g()$ is **linear**:
+
+::: {.callout-tip title="Proof" appearance="minimal"}
+$g(E(x)) = g((X_1 + \ldots + X_n)/n)$, then if $g()$ is linear, this equals <br>
+$(g(X_1) + \ldots + g(X_n)) / n = E(g(X)) = E(Y)$.
+:::
+
+Most realistic models are **non-linear**, therefore need Monte Carlo simulation to get the true expectation of the output. 
 
 
 # One-way sensitivity analysis {#small22}
@@ -631,7 +712,7 @@ Answers questions like "what if [parameter] was actually $b$ instead of $a$"
 
 :::: {.columns}
 
-::: {.column width="60%"}
+::: {.column width="50%"}
 For each parameter, compare model output with 
 
 * parameter at a "low value"
@@ -650,15 +731,37 @@ What if all the _other_ parameters are uncertain?  **Probabilistic one-way sensi
 
 :::
 
-::: {.column width="40%"}
+::: {.column width="50%"}
 
-Tornado plot TODO nicer 
+Tornado plot
 
-![](plots/tornado.png)
+![](plots/tornado.svg)
 
 :::
 
 ::::
+
+
+
+# Limitations of one-way sensitivity analysis 
+
+Arbitrary choice of "low" and "high" value may not convey the effect of the parameter
+
+:::: {.columns}
+::: {.column width="50%"}
+   e.g. if effect of parameter is nonlinear
+:::
+::: {.column width="50%"}
+![](plots/sa_nonlin.svg)
+:::
+:::: 
+
+. . .
+
+What if parameters have correlated effect on the outcome?<br>
+Hard to vary more than one parameter at a time 
+
+
 
 
 
@@ -683,12 +786,11 @@ A different (related) question: _"what would be the benefit of getting better in
 
 This is **Value of Information** analysis
 
-[Example - connect to a result from probabilistic 1 way SA.  Looks like varying ? within plausible range has more of an effect than... so we might want to get better info ] 
 
 
 # Value of Information 
 
-Given current information $x$ model output is uncertain.  But how much more precise would it get... 
+Given current information, model output is uncertain.  But how much more precise would it get... 
 
 if we were to learn some parameter exactly?
 
@@ -696,7 +798,7 @@ if we were to learn some parameter exactly?
 
 . . .
 
-if we conducted a study <small>(say, a survey of 100 people</small> to estimate it
+if we conducted a study [(say, a survey of 100 people)]{#small16} to estimate it
 
 * **Expected value of sample information**
 
@@ -736,7 +838,7 @@ Define value as **"precision of estimate"** (e.g. health impact of scenario)
 
 * More precise estimates (implicitly) assumed to ultimately lead to benefits
 
-* If needed, trade off informally with costs of research <small>(willingness to pay for more precise estimates? Not covered here)</small>
+* If needed, trade off informally with costs of research [(willingness to pay for more precise estimates? Not covered here)]{#small16}
 
 . . . 
 
@@ -788,7 +890,7 @@ We don't know $X$ so we average over our uncertainty
 
 
 ::: {#small16}
-$var(Y)$: variance of $Y$ 
+$var(Y)$: uncertainty before learning $X$
 
 $E_x(var(Y | X = x))$: *residual variance*: mean of ("observed" - fitted) over different $x$
 :::
@@ -803,7 +905,7 @@ $E_x(var(Y | X = x))$: *residual variance*: mean of ("observed" - fitted) over d
 
 Regression function of output on input will not necessarily be linear.
 
-*Spline* regression <small>(automated choice of smoothness, works well enough in this context)</small>
+*Spline* regression [(automated choice of smoothness, works well enough in this context)]{#small16}
 
 ```
 lm(Y ~ X)  # linear model
@@ -812,7 +914,7 @@ gam(Y ~ X) # spline ("generalized additive") model
 ```
 
 The `voi` package can take care of extracting ingredients needed for the 
-EVPPI computation (see the practivel)
+EVPPI computation (see the practical)
 
 ```
 library(voi)
@@ -821,7 +923,7 @@ evppivar(outputs, inputs)
 
 # EVPPI for more than one parameter at once 
 
-**Example**: dose-response curve governed by four different parameters $\alpha$, $\beta$, $\gamma$, $\tau$. Estimate the expected value of *jointly* learning all four of them <small>(hence learning the dose-response curve)</small>
+**Example**: dose-response curve governed by four different parameters $\alpha$, $\beta$, $\gamma$, $\tau$. Estimate the expected value of *jointly* learning all four of them [(hence learning the dose-response curve)]{#small16}
 
 Regression model with four predictors, e.g.
 
@@ -829,7 +931,7 @@ Regression model with four predictors, e.g.
 gam(Y ~ alpha + beta + gamma + tau) 
 ```
 
-More advanced regression models available, which automatically choose the best fitting regression function for Y given the predictors <small>(and their interactions)</small>: see the practical about the `voi` package
+More advanced regression models available, which automatically choose the best fitting regression function for Y given the predictors [(and their interactions)]{#small16}: see the practical about the `voi` package
 
 
 # Presenting EVPPI results
@@ -870,7 +972,7 @@ We will never get perfect information, but we may get **better** information via
 
 * Slightly harder to define and compute
 
-* Previously used in health economic decision models, but not (yet!) health impact models
+* Previously used in health economic decision models, but not (yet!) used in health impact models
 
 * See `voi` package and references there for some examples.
 
@@ -895,13 +997,13 @@ See `voi` package and references there for some examples.
 
 # Practical session 
 
-... Use of "voi" package
+... Use of `voi` R package
 
 
 
 
 
-# Group discussion of advanced topics 
+# Discussion
 
 What uncertainty/sensitivity questions do you want to answer in your own work? 
 

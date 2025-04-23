@@ -1,5 +1,5 @@
 ---
-title: Uncertainty in quantitative health impact modelling: practicals
+title: Uncertainty in quantitative health impact modelling: practical exercises
 author: Christopher Jackson<br>MRC Biostatistics Unit, University of Cambridge
 email: chris.jackson@mrc-bsu.cam.ac.uk
 format:
@@ -9,27 +9,43 @@ format:
     incremental: true
     preview-links: auto
     theme: styles.scss
+	callout-icon: false
 ---
 
 
 
 
-# What is a parameter 
+# What is a parameter (slide 5)
 
-Suppose we want to estimate the following parameters to include in a health impact model.
+::: {.callout-note}
+## Learning objectives
+Definition of a parameter as a summary of knowledge.  Understanding how parameters are estimated by summarising individual observations.
+:::
 
-In an ideal world where we can measure anything, what would we measure, on what individuals?  How would we summarise the individual-level measurements to estimate the parameter? 
+Suppose we want to estimate the following parameters to include in a health impact model.   In an ideal world where we can measure anything, what would we measure, on what individuals?  How would we summarise the individual-level measurements to estimate the parameter? 
 
 * background/baseline exposure to PM2.5
 
-* relative risk of lung cancer for one unit increase in exposure to PM2.5
-
 * the incidence of a disease 
+
+* the relative risk of this disease for one unit increase in exposure to PM2.5
 
 * the mortality rate for people with a disease 
 
+Try to think of other kinds of parameters in models, and how they might be estimated in theory from summaries of individuals
 
-<!-- Mine Anna's paper for harder examples -->
+
+<!-- Could mine Anna's paper for harder examples -->
+
+
+## Answer 
+
+* A person's exposure -- perhaps averaged over time and space.  But this will vary according to your model.  Do you want to assign exposures for a synthetic person with a particular characteristics?  If so - you would want to observe many individuals with those characteristics and take an average.  Or sample a value if want to include noise?  Will it make a difference if average out?   Is this getting too advanced. 
+
+* does a person get the disease within one year.  prop of people getting the disease within one year
+
+* does a person with x=a+1 get disease with 1 year (say). does a person with x=a get LC within 1 year.  prop(a+1) / prop(a).  May depend on the baseline a. 
+
 
 
 # Variability versus uncertainty 
