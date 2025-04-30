@@ -1,0 +1,260 @@
+---
+title: Estimating disease epidemiology at a smaller scale
+author: Christopher Jackson<br>MRC Biostatistics Unit, University of Cambridge
+email: chris.jackson@mrc-bsu.cam.ac.uk
+format:
+  revealjs: 
+    embed-resources: true
+    slide-number: true
+    incremental: true
+    preview-links: auto
+    theme: styles.scss
+---
+
+
+# Background 
+
+National agencies usually publish disease data [(e.g. mortality, incidence, prevalence)]{#small18} for **large population subgroups**, commonly including
+
+* age group and sex
+
+* area 
+
+. . .
+
+Health impact models want these for **smaller subgroups**, e.g. 
+
+* smaller areas 
+
+* socioeconomic indicators (deprivation indices, education etc...)
+
+* combinations of all of the above
+
+. . .
+
+[In a microsimulation model, synthetic individuals are labelled with several characteristics - how finely can we describe their disease risk?]{#small20}
+
+
+# Different sources of data 
+
+National agencies may publish cross-tabulations of disease outcomes:
+
+* by age/sex, by small area, by socioeconomic indicators **separately**
+
+* **but not** by all of these factors **jointly** 
+
+. . .
+
+May also be cohort studies or other literature giving estimates of disease outcomes by particular predictors (e.g. education). 
+
+
+# Make the most of all sources of data
+
+We cannot know for sure things that are not observed, but we may estimate them under **clear assumptions**
+
+For example: an assumption that some risk factors act *independently* on the risk of a disease outcome.
+
+
+
+# Example: mortality in Melbourne
+
+:::: {.columns}
+
+
+::: {.column width="55%"}
+
+* Mortality rates by year of age and sex, for whole state. 
+
+* **Standardised** mortality rates $r^{std}_i$ by small areas $i$
+
+    * Expected number of deaths in the area *if the age/sex balance of the area were the same as the standard population*
+	
+	* Convert to *excess rate* $r^{std}_i / r^{std}_{ave}$ relative to average
+	
+	* [Average of area-specific rates weighted by area population $n_i$: $r^{std}_{ave} = \sum_i n_i r^{std}_i / \sum_i n_i$]{#small18}
+	
+	<!-- todo 
+	is this the same as the national rate in theory? ie over all age/sex.
+	what is a standard population?  the whole state one? 
+	--> 
+	
+:::
+
+::: {.column width="45%"}
+![](plots/melb_mort.svg)
+:::
+
+::::
+
+
+# Disaggregating disease outcomes: using standardised rates
+
+Estimate small-area-specific rate for particular age/sex as
+
+* large-area rate by age/sex, multiplied by 
+
+* excess age/sex standardised rate for small area
+
+. . . 
+
+<b>General principle</b>: estimate rate by risk factors A x B as 
+
+* rate by risk factor A, multiplied by 
+
+* excess rate (standardised relative to A) for risk factor B 
+
+. . .
+
+<b>Assumption</b>
+Risk factors act independently 
+
+
+# Results
+
+
+:::: {.columns}
+
+
+::: {.column width="40%"}
+Mortality by age and sex<br>
+Mortality by area 
+![](plots/melb_mort.svg){width="100%"}
+:::
+
+::: {.column width="60%"}
+Mortality disaggregated by year of age, sex and area 
+
+![](plots/melb_mort_disagg.svg){width="100%"}
+:::
+
+::::
+
+
+
+
+
+# Example: mortality in Melbourne, by education 
+
+We now have (estimates of) mortality by year of age, sex and small area. 
+
+Now we want to disaggregate this further to account for socieconomic variations within the area 
+
+Use data on
+
+* relative risk of mortality for (high / low education) [(for broad age groups)]{#small16}, assuming this effect is the same for all small areas.
+
+* the proportion of people in each area with different levels of education
+
+. . .
+
+Hence infer mortality in each area by year of age, sex, and education
+
+
+# Disaggregating disease outcomes
+
+Take the mortality data for a specific group (e.g. year of age, sex, small area) 
+
+:::: {.columns}
+::: {.column width="45%"}
+| Died | Survived | 
+|-----|-----|
+| 6%  | 94%  |
+:::
+::: {.column width="45%"}
+| Low education | High education | 
+|-----|-----|
+| 60%  | 40%  |
+:::
+::::
+
+. . . 
+
+Problem is to fill in the 2 x 2 table 
+
+&nbsp; | Died | Survived | Total | 
+|-----|-----|-----|-----|
+Low education |   |     | 60% 
+High education |  |    | 40%
+Total | 6%  | 94%  | 100%
+
+
+
+# Disaggregating disease outcomes
+
+Given knowledge of one cell, we can deduce the other cells
+
+&nbsp; | Died | Survived | Total | 
+|-----|-----|-----|-----|
+Low education |  x |  60%-x   | 60% 
+High education | 6%-x |  34%+x  | 40%
+Total | 6%  | 94%  | 100%
+
+. . .
+
+If we know the **relative risk of death** between the two education groups, we can deduce x, and fill in the whole table. 
+
+
+
+
+
+# Disaggregating disease outcomes
+ 
+Algebraic explanation: we know, for some population:
+
+* $r_{ave}$: average mortality rate
+
+* $p_0, p_1 = 1 - p_0$:, proportions with/without the risk factor 
+
+* $RR$: relative mortality with/without the risk factor
+
+. . . 
+
+and we want 
+
+* $r_0,r_1$: mortality in this group with / without the risk factor
+
+. . . 
+
+$$
+\begin{split}
+r_{ave} & = p_0 r_0 + p_1 r_1 \\
+        & = p_0 r_0 + p_1 r_0 RR + \\
+r_0 & = r_{ave} / (p_1 RR + p_0)
+\end{split}
+$$
+
+## Generalisation to risk factors with more than two categories
+
+e.g. socioeconomic index, with levels $i = 1, 2, ...$.  We know
+
+* $p_i$: proportion of population in level $i$
+
+* $RR_i$: relative risk of mortality for level $i$, compared to level 1
+
+. . . 
+
+and want to obtain $r_i$, absolute mortality in level $i$ 
+
+. . . 
+
+$$
+r_{ave} = p_1 r_1 + p_2 r_2 + ... 
+        = r_1 \sum_{i=1}^G p_i RR_i
+$$
+
+gets us $r_1$ in terms of known quantities.
+
+Then compute $r_i = r_1 RR_i$
+
+
+
+## Summary 
+
+* General principle for disaggregating tabular data on some outcome (e.g. disease mortality, incidence)
+
+* Estimate joint effects of multiple risk factors, given effect of each separately
+
+* Requires relative rates/risks + population sizes for each risk factor, or standardised rates. 
+
+* Assumes that different risk factors act independently 
+

@@ -1,26 +1,25 @@
 ---
-title: Uncertainty in quantitative health impact modelling: practical exercises
-author: Christopher Jackson<br>MRC Biostatistics Unit, University of Cambridge
+title: "Uncertainty in quantitative health impact modelling: practical exercises"
+author: Christopher Jackson, MRC Biostatistics Unit, University of Cambridge
 email: chris.jackson@mrc-bsu.cam.ac.uk
 format:
-  revealjs: 
+  html: 
+    number-sections: true
     embed-resources: true
-    slide-number: true
-    incremental: true
     preview-links: auto
     theme: styles.scss
-	callout-icon: false
+    callout-icon: false
+  pdf:
+    number-sections: true
+    callout-icon: false
+editor_options: 
+  chunk_output_type: console
 ---
 
 
 
 
-# What is a parameter (slide 5)
-
-::: {.callout-note}
-## Learning objectives
-Definition of a parameter as a summary of knowledge.  Understanding how parameters are estimated by summarising individual observations.
-:::
+# What is a parameter, and why are parameters uncertain (discussion)
 
 Suppose we want to estimate the following parameters to include in a health impact model.   In an ideal world where we can measure anything, what would we measure, on what individuals?  How would we summarise the individual-level measurements to estimate the parameter? 
 
@@ -32,113 +31,335 @@ Suppose we want to estimate the following parameters to include in a health impa
 
 * the mortality rate for people with a disease 
 
-Try to think of other kinds of parameters in models, and how they might be estimated in theory from summaries of individuals
+Try to think of other kinds of parameters in models, and how they might be estimated in theory from summaries of individuals.
 
+Why might the measurements we want be hard to obtain in practice?   Might we measure something similar but still useful?
 
 <!-- Could mine Anna's paper for harder examples -->
 
+::: {.callout-note}
+## Learning objectives
+Definition of a parameter as a summary of knowledge.
 
-## Answer 
-
-* A person's exposure -- perhaps averaged over time and space.  But this will vary according to your model.  Do you want to assign exposures for a synthetic person with a particular characteristics?  If so - you would want to observe many individuals with those characteristics and take an average.  Or sample a value if want to include noise?  Will it make a difference if average out?   Is this getting too advanced. 
-
-* does a person get the disease within one year.  prop of people getting the disease within one year
-
-* does a person with x=a+1 get disease with 1 year (say). does a person with x=a get LC within 1 year.  prop(a+1) / prop(a).  May depend on the baseline a. 
+Understanding how parameters are estimated by summarising individual observations.
+:::
 
 
+{{< pagebreak >}}
 
-# Variability versus uncertainty 
+# Quantifying judgements with probability (discussion)
 
-Which of these things are individual-level variability? [some]
-Which are subject to uncertainty [all?]
-Surely all and all if they are an empirical average, perhaps small ignorable 
+Suppose we have read some published data saying that there are 25.7 passengers per bus on average in a particular city.  Judge 95% credible intervals for 
 
-Need clearer way to teach -- learning point could be that we are free to model indiv unc but it may not matter for a population model.  Knowledge unc and heterogeneity are more important
+(a) the number of passengers in a particular bus trip in this city
 
-What if interested in variance over subgroups - heterogeneity, new concept 
+(b) the average number of passengers per bus in this city
 
-Something to do with individual travel - survey data 
+(c) the average number of passengers per bus in a different city in the same country
 
-time travelled in a week for the 237th person in the synthetic population 
-
-average time travelled for 30 year old women 
-
-average speed of cars in Cambridge
-
-for person with same characteristics as 237th person, median amount of time travelled by bike in one week
-
-total amount of 
-
-proportion of cyclists that are male 
-
-MET for an activity
-
-Why are we teaching this?  does it come into synthetic pop thign. 
-yes it comes into METs 
-237th person has travel times simulated, assigns METs, exposures for those times
-Get a total exposure over the population 
-and a variance in exposure over the pop 
-do we assign indiv MET randomly given travel time 
-then where does the transformation come from.  Mean is published 
-published individual SDs.  convert to population 
+There are no "correct answers" --- you can draw on any personal experience or general knowledge you have.    Think whether these intervals should be be the same or different, and record any reasoning or factors used to arrive at the judgement.
 
 
-# Getting uncertainty from statistical models
-
-We published the 
-
-Test interpreting credible intervals, SEs etc 
-
-Test log transformation 
-
-
-
-# Simple examples of propagating uncertainty
-
-e.g. with cars vs trucks, speed etc 
-
-or MET thing 
-
-
-
-# Log normal distributions 
-
-
-A paper publishes MET with an estimate and a standard deviation between individuals
-[of a particular population, test] 
-
-Derive the log normal distribution for the indivudual-level MET 
-
-Give two reasons why this might be unsuitable for use as a distribution in our health impact model
-
-(a) It is the distribution over individuals, not the uncertainty about the average value in a population 
-
-(b) It may be describing a different population 
-
-We make a judgement for our context that it may have up to ?? and up to ?? 
-
-Derive the log normal distribution (answer by transforming the est and CI and deriving the normal from the CI width) 
-
-Or do it with the upper and lower limit.  Then compare.  Teaching point is that it probably doesn't matter how you do it.  Transparency is the key.  Just use the measure that you are most confident about and calibrate if needed
-
-Credible interval is 4 times the SD for a normal 
+::: {.callout-note}
+## Learning objectives
+Getting used to quantifying uncertainties with probabilities, based on informal judgements.
+:::
 
 
 
 
-# Beta distributions
+
+{{< pagebreak >}}
+
+# Obtaining full probability distributions from published estimates and uncertainties
+
+1. Derive appropriate probability distributions for 
+
+    (a) The proportion of truck vehicle km travelled to car vehicle km travelled,
+    given an estimate of 0.3 and a 95\% credible interval of 0.15 to 0.45
+	(assuming car km is always greater than truck km).
+
+    (b) The amount of time a person spends walking from home to a bus stop
+    per day, given an estimate of 10 minutes and a standard deviation of 3 minutes.
+
+In each case, compute the *actual* credible interval for the derived distribution, and check that it is similar to the information you supplied.
+
+::: {.callout-tip title="Hint"}
+The functions `qbeta` or `qlnorm` in R can be used to compute the quantiles of the Beta or log-normal distribution,
+e.g. a 95% credible interval for the Beta(2, 2) is `qbeta(c(0.025, 0.975), 2, 2)`.
+:::
+
+2. In case (1a), suppose you have used the "method of moments"
+technique in the slides to get a Beta distribution.  This is not the
+only reasonable way to get an uncertainty distribution for a
+proportion, given an estimate and credible interval.  Alternative ways are:
+
+    * *Logit-normal distribution*: assume that the $logit$ of the
+proportion $p$, that is, $log(p / (1-p))$ is normally distributed.
+Transform the estimate and credible limits for the proportion $p$ to
+the logit scale, then convert the transformed credible interval to a
+standard deviation defining the normal distribution.  A quantile of
+the distribution on the natural scale can then be obtained by using
+the inverse logit transform $exp(x) / (1 + exp(x))$ on the logit-scale
+quantile.
+
+    * *Least squares fitting*.  This is a procedure implemented in the function `fitdist` from the R package `SHELF` for structured expert elicitation.  For example, given an estimate of `med` (interpreted as a median) and a credible interval of `lower`,`upper`, a best-fitting Beta distribution can be derived as
+     
+      ```{r,eval=FALSE}
+      lower <- 0.15; med <- 0.3; upper <- 0.45
+      SHELF::fitdist(vals = c(lower, med, upper), 
+                     probs = c(0.025, 0.5, 0.975), 
+                     lower = 0, upper = 1)$Beta
+      ```
+
+    Implement these procedures for the truck km proportion in (1a), deriving the 95% credible interval for the proportion under each of these two distributions.
 
 
-* LO: get used to using dpqr functions for beta 
-
-* Try a thing multiple ways, get similar answers.   LO doesn't matter
+3. (advanced).  Suppose we have a set of 3 or more uncertain quantities which add up to 1. For example, the proportion of road transport-related PM2.5 emissions due to (a) motorcycles, (b) cars, (c) buses, (d) trucks (assuming that these together comprise all road transport-related PM2.5 emissions).  How might we use Beta distributions to quantify these uncertainties?
 
 
 
+::: {.callout-note}
 
-# Monte Carlo
+## Learning objectives
 
-* LO: doing MC in R.  Calculate a thing that can only be done with MC. Very simple HI model e.g. from voi hia paper 
+* Obtaining distributions given estimates and credible intervals (or standard errors)
 
-* LO - uncertainty affects the best estimate.  Plug ins vs MC.   Perhaps not much but if we can then we should 
+* When log normal or beta distributions are appropriate
+
+* Learning that the distributions themselves are approximations made for convenience
+
+* Verifying that alternative approaches to getting distributions from limited information about uncertainty give qualitatively similar results
+
+* (advanced) Expressing uncertainty around the probabilities behind a categorical variable
+
+:::
+
+
+
+
+
+
+
+{{< pagebreak >}}
+
+# Monte Carlo simulation of health impact models
+
+We have the following very simple health impact model (the one described in PAPER)
+
+We want to estimate of the health impacts of a scenario where the emissions of PM2.5 air pollution from transport are $D$ times the current amount.  Consider only one population group and health outcome (incidence of stroke).   The parameters include 
+
+* $I_0$: incidence of stroke (expected number of cases per year) in the baseline (current emissions) scenario
+
+* $\mu$: background concentration of PM2.5 in the baseline scenario
+
+* $\pi$: proportion of PM2.5 due to transport...
+
+* and the relative risk of stroke for exposure level $x$ is described by the nonlinear function $g_2(x, \mathbf{d}) = 1  + \alpha(1 − exp(−\beta(x − \tau)^\gamma))$, with uncertain parameters $d = (\alpha, \beta, \gamma, \tau)$.
+
+(a) Write down an expression for the background PM2.5 concentration in the reduced-emissions scenario, in terms of $\mu$, $\pi$ and $D$.  
+
+(b) Write down an expression for the _reduction_ in stroke cases in the 
+    scenario where emissions are $D$ times the current amount, in terms of $g_2()$
+    and your answer to (a).
+
+(c) Implement this model as an R function which computes the reduction in stroke
+    cases given the emissions reduction $D$ and the parameters.
+
+(d) Suppose $I_0$ is fixed at 18530, and $(\alpha=13, \beta=0.015, \gamma=0.48, \tau=4.2)$, and the remaining parameters are uncertain with the following distributions 
+
+    * $\mu$: log normal with mean 2.3 and SD 0.3 on the log scale
+	
+  	* $\pi$: Beta(5.7, 8.9)
+  	
+  	Use Monte Carlo simulation to estimate a median and 95% credible interval for the
+  	expected number of stroke cases reduced when emissions are $D=0.5$ times the current amount.  	Compare the results with $n=1000$ and $n=10000$ simulations.  As a rough guess,
+  	how many significant figures do we have in the Monte Carlo estimate of the median?  
+	
+(e) Compute the Monte Carlo standard error for the estimate of the median, compared between $n=1000$ and $n=10000$ samples.  Does this confirm our guess? 
+
+(f) Compare the mean and median of the distribution of the health impacts with the health impact if the uncertain parameters were fixed at point estimates (say, at the means of their distributions: $\mu = 10.4$ and $\pi = 0.39$)
+
+
+
+::: {.callout-note}
+
+## Learning objectives
+
+* Implement a simple Monte Carlo analysis in R. 
+
+* Understanding Monte Carlo run length and standard error 
+
+* Understanding different definitions of the "best estimate".
+
+:::
+
+
+{{< pagebreak >}}
+
+
+# Full ITHIM model 
+
+::: {.callout-note}
+
+## Learning objectives
+
+* Experience an uncertainty analysis and Monte Carlo computation in a realistically complex health impact model. 
+
+:::
+
+
+
+{{< pagebreak >}}
+
+# Value of Information analysis
+
+This is a demonstration of a Value of Information analysis in the simplified model from the Monte Carlo question above.  There are no questions / exercises --- just step through the demonstration, check everything makes sense, and feel free to ask if not. 
+
+We wish to estimate the amount of uncertainty in the model output that might be reduced with perfect knowledge of one of the model inputs.  Or in other words, which of the uncertain inputs are most driving the uncertainty in the output.  This could help us prioritise further research to get better information to improve the model. 
+
+In this simplified model, there are only two uncertain parameters: the background PM2.5 concentration $\mu$ and the proportion $\pi$ due to transport.  In the question above we defined uncertainty distributions for these parameters, drew Monte Carlo samples from the model inputs, and used these to get a Monte Carlo sample from the uncertainty distribution of the model output (expected stroke cases averted).
+
+Suppose we have drawn 10000 samples from each of these quantities, and they are stored in the vectors `mu10000` (background PM2.5), `ptransp10000` (proportion from transport) and `sim10000` (model output).  Look at the solution to the Monte Carlo question for code to obtain these.
+
+```{r,echo=FALSE,eval=TRUE}
+dose_response <- function(pm,alpha,beta,gamma,tau){
+  1 + alpha * ( 1 - exp(- beta * ( pmax(pm - tau, 0) )^gamma ) )
+}
+
+model <- function(D, mu, ptransp, dr)  { 
+  scenario_pm <- mu*(ptransp*D + 1 - ptransp)
+  RR_base <- dose_response(mu, dr$alpha, dr$beta, dr$gamma, dr$tau) 
+  RR_scenario <- dose_response(scenario_pm, dr$alpha, dr$beta, dr$gamma, dr$tau) 
+  inc_diff <- inc_base - inc_base*RR_scenario/RR_base
+  inc_diff
+}
+set.seed(1)
+inc_base <- 18530
+mu10000 <- rlnorm(10000, 2.3, 0.3)
+ptransp10000 <- rbeta(10000, 5.7, 8.9)
+dr <- list(alpha=13, beta=0.015, gamma=0.48, tau=4.2)
+sim10000 <- model(D=0.5, mu=mu10000, ptransp=ptransp10000, dr=dr)
+```
+
+The expected stroke cases averted is around 1000, with a SD of around 500 and 95% credible interval of around 400 to 2300.
+```{r}
+mean(sim10000)
+sd(sim10000)
+quantile(sim10000, c(0.025, 0.975))
+var(sim10000)
+```
+Value of Information calculations for this sort of model are done in terms of the variance (the square of the standard deviation), which here is around 200,000.  The expected value of partial perfect information (EVPPI) is the expected amount the variance will reduce if we learn the exact value of some parameter or parameters.   As explained in the lecture slides, this is computed by fitting a flexible regression model of the simulated output in terms of the simulated inputs, and calculating the fitted values and residuals.
+
+The `voi` package will take care of doing these calculations and extracting the information needed to get the EVPPI.      Here we illustrate what is going on 
+inside the package.    The flexible regressions (by default) are fitted using the `gam` function from the `mgcv` package (note `s()` represents a spline function).   Here are the regression models that are fitted
+for each of the two inputs. 
+
+```{r,message=FALSE}
+library(voi)
+library(mgcv)
+library(ggplot2)
+dat <- data.frame(mu=mu10000, ptransp=ptransp10000, sim=sim10000)
+ggplot(dat, aes(x=mu, y=sim)) + 
+  geom_point(alpha=0.1) + 
+  geom_line(aes(y = fitted(gam(sim10000 ~ s(mu10000)))),
+            col="blue", lwd=2) + 
+  xlab("Background PM2.5") + ylab("Expected stroke cases averted")
+```
+
+The model output appears to be weakly associated with the background PM2.5, for lower
+values of background PM2.5
+
+```{r}
+ggplot(dat, aes(x=ptransp, y=sim)) + 
+  geom_point(alpha=0.1) + 
+  geom_line(aes(y = fitted(gam(sim10000 ~ s(ptransp10000)))),
+            col="blue", lwd=2) +
+  xlab("Proportion of PM2.5 from transport") +
+  ylab("Expected stroke cases averted")
+```
+
+By contrast, the model output appears to depend strongly on the proportion of PM2.5
+due to transport. 
+
+To extract the EVPPI for each of these parameters, the `evppivar` function is used.
+The arguments are `outputs` (vector of samples model outputs), `inputs` (data frame including sampled model inputs), and `pars` (which columns of this data frame 
+we want separate EVPPIs for)
+
+```{r}
+evppivar(outputs=sim10000, inputs=dat, pars = list("mu","ptransp"))
+```
+
+As expected, the expected value of learning the proportion due to transport is 
+higher.  These might be presented as _proportions of variance explained_:
+
+```{r}
+evppis <- evppivar(outputs=sim10000, inputs=dat,
+                   pars = list("mu","ptransp"))$evppi
+evppis / var(sim10000)
+```
+
+Or perhaps more usefully, we might predict what the remaining SD or credible interval of the output might be after learning perfect information about one of these inputs. The remaining SD is the square root of the variance remaining (original variance minus EVPPI).
+
+```{r}
+sd_remaining <- sqrt(var(sim10000) - evppis)
+sd_remaining 
+```
+
+The SD is predicted to be of the order of 400 or 200 if learning $\mu$ and $\pi$ 
+respectively.   We might convert these to a rough "predicted credible interval" 
+for the expected stroke cases averted, by adding $\pm$ 2 SDs to the estimate of 1000.
+Hence if we learnt $\pi$, the CI would reduce in width, to (600,1400) from its
+original (400,2300).
+
+## Joint EVPPI for multiple related parameters
+
+Note that in this model, these parameters _do not act independently_ on the output.  The reductions in uncertainty from learning _both parameters together_ cannot be simply calculated by combining the separate EVPPIs for each parameter.
+
+To calculate the _joint_ EVPPI for more than one parameter, representing the value of learning the parameters in combination, a flexible regression model is fitted that includes all those parameters as predictors, instead of just one predictor (as we had before).   To do this with the `evppivar` function, supply a _vector_ of parameter names to the `pars` argument, rather than a list. 
+
+Here this shows there is expected to be a greater benefit from learning both the parameters jointly, compared to learning them separately.
+```{r}
+evppivar(outputs=sim10000, inputs=dat, pars = c("mu","ptransp"))
+```
+
+(In theory, since there are only two parameters in the model, the EVPPI for learning
+both of them should be equal to the original variance of the model output - since 
+we reduce this variance to zero if we have perfect information on both.  However
+it is slightly different in practice, due to the approximation made by the regression 
+model) 
+
+
+## Further resources 
+
+* The paper "A guide to value of information methods for prioritising research in health impact modelling" (Jackson et al, Epidemiologic Methods, 2021) [(https://doi.org/10.1515/em-2021-0012)](https://doi.org/10.1515/em-2021-0012).  
+This goes into more detail on this particular example model.
+
+* The web site for the `voi` package 
+
+  [https://chjackson.github.io/voi](https://chjackson.github.io/voi)
+
+  gives resources and worked examples to learn about using VoI methods in models for making decisions between alternative policies, as well as models for estimating quantities (e.g. health impacts).
+
+
+
+
+
+
+{{< pagebreak >}}
+
+# Technical notes about probability distributions
+
+Many of the methods for uncertainty quantification we have discussed invoke the idea of a "best estimate" or "central point" of a distribution.  There is at least three definitions of this: 
+
+**Mean**: average value.  If $X_1,X_2,..$ all come from this distribution, then $(X_1 + ... + X_n) / n$ (the "sample mean") approaches the mean of the distribution as $n$ gets bigger.
+
+**Median**: value for which 50% of the distribution is less than this value 
+
+**Mode**: commonest value, or value with highest probability density 
+
+These all agree for symmetric distributions, e.g. the normal.  If you are trying to obtain an uncertainty distribution, and you have arbitrarily used one of these three as the "best estimate", but they disagree, consider whether the amount of disagreement matters.  Might any results of interest be affected?   If so, more information is probably needed to describe the evidence confidently.
+
+**Standard deviation**: a measure of variability in a distribution
+
+**Standard error**: a measure of the uncertainty in the estimate of a mean, due to having only sampled $n$ observations $X_1,\ldots,X_n$.  Defined as the standard deviation of $(X_1 + ... X_n) / n$.  If the $X_i$ are independent with standard deviation $\sigma$, then the standard error is $\sigma / \sqrt{n}$.

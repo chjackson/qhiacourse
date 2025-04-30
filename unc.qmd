@@ -17,12 +17,17 @@ format:
 <!-- 
 
 Map of presentation. 
-[min] 1 - 10, what is a parameter, what is uncertainty 
-[min] 11 - 20, how to get credible intervals 
-[min] 21 - 26, how to get distributions 
-[min] 27 - 30, Doing Monte Carlo.  SA 
-[min] 32 - 42, VoI 
-
+[10 min] 1 - 10, what is a parameter, what is uncertainty 
+[5 min prac 1]
+[20 min ] 11 - 20, how to get credible intervals 
+[5 min prac 2 ] 
+[10 min] 21 - 26, how to get distributions 
+[30 min prac 3 ]
+[10 min] 27 - 30, Doing Monte Carlo.  SA 
+[30 min prac 4 ]
+[20 min] 32 - 42, VoI 
+[20 min Voi prac]
+160 min in total.  2 hours 40 
 
 OPPORTUNITIES for interaction 
 * [slide 1] How many of you have done a probabilistic model?
@@ -31,59 +36,9 @@ OPPORTUNITIES for interaction
 
 TODO 
 
-* How many samples in MC? 
-
 * ITHIM picture
 
-* Work out how to interact on indiv/unc,  unc examples,  whys unc matter 
-
-* UQ practical 
-
-* MC practical 
-
-* VoI practical 
-
-* MC animation?
-
-
-
-Paper example 
-Scenario where pm2.5 pollution emissions from transport D x less 
-Incidence of stroke 
-Pars: 
-
-* background conc mu
-* prop pi due to transport 
-* linear rel between change in emissions and change in conc, 
-  background in scen then mu*(pi*D + (1 - pi))
-* baseline incidence I0, exp cases per year 
-* dose response g2(x,d) for exposure x and pars d 
-* rel incidence R = g2(scen conc, d) / g2(base conc, d)
-* reduction is I0 - I0*R
-
-Uncs.
-Background: lognormal with given CI 
-Pi-transport: beta dist 
-Relative risk from a statistical model with 
-
-"[pars] estimated from data given by the published relative risks at
-different exposures x. A sample from the joint distribution for d was
-obtained by repeating this estimation with alternative plausible
-relative risks simulated using the published estimates and their
-standard errors" 
-
-huh. could use as an example of an adhoc unc calculation 
-is it a bootstrap 
-more like a meta analysis 
-or is it like a deterministic model in itself 
-like nonlin pars = g( pub RRs ) and pub RRs are uncertain
-g is best fit line 
-Thing this excludes is unc about fitted curve given specific RRs 
-howd i do it??  like a bayes meta analysis 
-
-Could represent by a multivariate normal rather than sample -- may be clearer??
-yeah start there for teaching --- illustrates that pars correlated -- log scale 
-
+* Animations for MC and MC error?
 
 --> 
 
@@ -153,6 +108,11 @@ Model transform parameters $\rightarrow$ output quantities.<br>
 Outputs also represent summaries over populations
 
 <!-- Premise of lecture... --> 
+
+# Exercise / discussion 1 
+
+What is a parameter and why are parameters uncertain (5 min) 
+
 
 
 # Parameters are generally uncertain
@@ -279,7 +239,7 @@ Two broad approaches
 
 (a) **Statistical analyses** of data (your own, or published analyses) giving *point* and *interval* estimates or standard errors
 
-(b) **Judgements** (informal or from structured elicitation), e.g.
+(b) **Judgements** (informal or from structured expert elicitation), e.g.
 
 * *point estimate* (best guess) for parameter value 
 
@@ -397,7 +357,7 @@ Might judge that code 1011 (MET 6.8) is a typical kind of cycling for our contex
 
 **Rough judgement: no "correct answer"!**
 
-<b>Note:</b> Does the parameter in our model represent the average for some population, or the value for a person / trip?  
+<b>Note:</b> Does the parameter in our model represent the average for some population, or the value for a person / trip?
 :::
 
 
@@ -491,6 +451,11 @@ When making judgements, consider, e.g.:
 
 * **relevance** of population, variations over time / between places
 
+
+
+# Exercise / discussion 2 
+
+Quantifying judgements with probability  (5 min) 
 
 
 
@@ -648,9 +613,11 @@ Could adjust by trial and error to match desired belief more closely.<br>
 
 
 
-# Practical - quantifying uncertainty around parameters 
+# Exercise 3 
 
-[ reference to ITHIM ] 
+
+Obtaining full probability distributions from published estimates and uncertainties   (20 min) 
+
 
 
 
@@ -677,6 +644,30 @@ https://medium.com/@norisk/visualizing-monte-carlo-simulations-with-r-and-gganim
 Do this with a trivial model eg the voi hia 
 --->
 
+
+# How many samples to run? 
+
+As $N$ gets greater, the summaries of the sample will not change much when you run more.
+
+* run enough until you have the precision you want
+	
+* do you really need more than 2 or 3 significant figures?
+
+. . . 
+
+::: {.fragment #small18}
+<b>More precisely</b>: the *Monte Carlo standard error* (MCSE) describes how accurate a summary of a Monte Carlo sample is. 
+
+* For the sample mean, the MCSE is $SD(sample) / \sqrt{N}$
+  
+* This reduces to zero as $N$ gets larger. 
+
+* We can then say the mean of the sample is precise to $\pm$ 2 MCSE
+::: 
+ 
+. . . 
+
+[If your model is very slow and doing Monte Carlo is too expensive to get the precision you want, then present MCSE alongside the estimate to show your readers how much precision you do have.]{#small16}
 
 
 
@@ -765,10 +756,10 @@ Hard to vary more than one parameter at a time
 
 
 
-# Practical - uncertainty analysis in a model
+# Exercise 5
 
+Monte Carlo simulation of health impact models (30 min)
 
-[ reference to ITHIM ] 
 
 
 
@@ -995,9 +986,11 @@ See `voi` package and references there for some examples.
 
 
 
-# Practical session 
+# Practical session 5
 
-... Use of `voi` R package
+Value of Information analysis, using the voi package 
+
+(Worked example, 20 min)
 
 
 
@@ -1007,5 +1000,5 @@ See `voi` package and references there for some examples.
 
 What uncertainty/sensitivity questions do you want to answer in your own work? 
 
-Do you have the tools to do this? 
+Do you have the tools and skills to do this, after this course? 
 
